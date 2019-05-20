@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ui-recoder</title>
+    <style>
+        body {
+            height: 2000px;
+        }
+        ul {
+            height: 200px;
+            overflow: scroll;
+            line-height: 2;
+        }
+    </style>
+</head>
+
+<body>
+<ul>
+    <li onclick="console.log(widn.xxx.xxxx)">simple error</li>
+    <li onclick="window.unhandleReject()">simple rejection</li>
+    <li id="errClick">error in other file</li>
+    <li id="rejectClick">rejection in other file</li>
+    <li>content 5</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li>content 6</li>
+    <li id="complete">complete</li>
+    <li id="start">start</li>
+</ul>
+
+<button id="addEle">add</button>
+<div id="addedElements" style="background-color: red"></div>
+<button id="reqJson">请求数据</button>
+
+<div contenteditable>venom a <a href="://baidu.com">baidu</a></div>
+
+<script>
+    function hello(obj) {
+        console.log(obj.name);
+    }
+</script>
+</body>
+</html>
