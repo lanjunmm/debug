@@ -81,14 +81,6 @@ export default class Jsonp extends EventHub implements Observer{
         this.hackAppendChild();
         this.hackInsertBefore();
         this.hackPrepend();
-
-        // let p = document.createElement('p')
-        // p.appendChild(document.createTextNode('加我一个！'));
-        // document.getElementsByTagName('body')[0].appendChild(p);
-        //
-        // let sr = document.createElement('script');
-        // sr.src="http://www.mocky.io/v2/5cdaa37f300000500068c8c8";
-        // document.getElementsByTagName('body')[0].appendChild(sr);
     }
     public install(){
         this.hackFunc();

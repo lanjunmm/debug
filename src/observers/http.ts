@@ -5,7 +5,8 @@ import {sendToRender} from '../utils/requestRender'
 import {REQUESTINIT} from './constants'
 // import {isFunction} from '../utils/is'
 
-
+/**大致思路完成部分：Fetch
+ * */
 export default class HttpObserver extends EventHub implements Observer {
     private xhrReqMap: Map<string, HttpReqMsgs> = new Map();
     private urlMatch = /(\w+):\/\/([^/:]+)(:\d*)?([^# ]*)/;
@@ -32,7 +33,6 @@ export default class HttpObserver extends EventHub implements Observer {
         _replace(window.navigator, "sendBeacon", replaceBeacon);
     }
 
-    //https://developer.mozilla.org/zh-CN/docs/Web/API/WindowOrWorkerGlobalScope/fetch
     private hackFetch() {
         if (!(window.fetch && window.fetch.toString().includes('native'))) {
             return;
@@ -79,13 +79,13 @@ export default class HttpObserver extends EventHub implements Observer {
                                 if(headers.length>0){ fetchArgs.secondArg[key] = headers; }
                                 continue;
                             }
-                            fetchArgs.secondArg[key]=  fetchArgs.secondArg[key] || config[key];
+                            fetchArgs.secondArg[key]=  config[key] || fetchArgs.secondArg[key] ;
                         }
                     }
-                    const msg = {
+                    const msg:HttpReqMsgs = {
                         type: 'network',
-                        requestFunc: 'fetch',
-                        fetArgs: fetchArgs
+                        requestFunc: HttpFuncs.fetch,
+                        data: fetchArgs
                     };
                     sendToRender(msg);
                     //TODO: 转发fetch信息到Render,接收Render的消息,并返回Response对象
@@ -195,28 +195,8 @@ export default class HttpObserver extends EventHub implements Observer {
         this.hackBeacon();
         this.hackFetch();
         this.hackXHR();
-        this.test();
     }
-    private test(){
-        var myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'text/xml');
-        myHeaders.append('Vary', 'Accept-Language');
-        var myInit:RequestInit = { method: 'GET',
-            headers: myHeaders,
-            mode: 'cors',
-            cache: 'default'};
-        var myRequest = new Request('http://www.mocky.io/v2/5cdaa37f300000500068c8c8',{method:"POST"});
-        fetch(myRequest,myInit).then(function(response) {
-            console.log(response);
-        });
-        // fetch('http://www.mocky.io/v2/5cdaa37f300000500068c8c8').then(data=>{
-        //     console.log(data)
-        // });
 
-        // var xhr = new XMLHttpRequest();
-        // xhr.open("get", "htdd");
-        // xhr.send(null);
-    }
     public uninstall() {
         _unReplace(window.navigator, 'sendBeacon');
         _unReplace(window, 'fetch');

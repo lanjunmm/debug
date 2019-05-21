@@ -21,7 +21,6 @@ export type HttpReqMsgs = {
     url?: string
     headers?: { [key: string]: any } // nonexistence in beacon request
     data?:any
-    input?: any[] // fetch request payload
     payload?: any // xhr request payload
     response?: any
     method?: string
