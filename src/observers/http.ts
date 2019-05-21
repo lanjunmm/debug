@@ -2,6 +2,7 @@ import EventHub from "../utils/eventHub";
 import {HttpFuncs, HttpReqMsgs, Observer} from "../interfaces/observer";
 import {_newuuid, _replace, _unReplace} from '../utils/tools'
 import {sendToRender} from '../utils/requestRender'
+import {REQUESTINIT} from './constants'
 // import {isFunction} from '../utils/is'
 
 
@@ -17,19 +18,17 @@ export default class HttpObserver extends EventHub implements Observer {
         if (!!navigator.sendBeacon) {
             return;
         }
-
         function replaceBeacon() {
             return function (this: Navigator, url: string, data) {
-                const msg: HttpReqMsgs = {
-                    type: "network",
-                    requestFunc: HttpFuncs.beacon,
-                    url: url,
-                    data: data
-                };
-                sendToRender(msg);
+                    const msg: HttpReqMsgs = {
+                        type: "network",
+                        requestFunc: HttpFuncs.beacon,
+                        url: url,
+                        data: data
+                    };
+                    sendToRender(msg);
             }
         }
-
         _replace(window.navigator, "sendBeacon", replaceBeacon);
     }
 
@@ -38,20 +37,67 @@ export default class HttpObserver extends EventHub implements Observer {
         if (!(window.fetch && window.fetch.toString().includes('native'))) {
             return;
         }
+        function replaceFetch(originFetch) {
+            return function (input: string | Request, config?: RequestInit) {
+                return new Promise((res,rej)=>{
+                    let fetchArgs = {
+                        firstArg: {
+                            type: "",
+                            url: null
+                        },
+                        secondArg:null
+                    };
 
-        function replaceFecch() {
-            return function (input: string | Request, config?: Request) {
-                const msg = {
-                    type: 'network',
-                    requestFunc: 'fetch',
-                    input: input,
-                    config: config
-                }
-                sendToRender(msg);
+                    if(typeof input === 'string'){
+                        fetchArgs.firstArg.type = "url";
+                        fetchArgs.firstArg.url = input;
+                    }else if (input instanceof Request){
+                        let keys = Object.keys(REQUESTINIT);
+                        let obj = {};
+                        for(let i=0;i<keys.length;i++){
+                            let key= keys[i];
+                            if(key=="headers"){
+                                let headers = REQUESTINIT[key];
+                                input[keys[i]].forEach((v,k)=>{ headers.push([k,v]); });
+                                obj[key] = headers;
+                                continue;
+                            }
+                            obj[key] = input[key] || REQUESTINIT[key];
+                        }
+                        fetchArgs.firstArg.type = "Request";
+                        fetchArgs.firstArg.url = input['url'];
+                        fetchArgs.secondArg = obj;
+                    }
+                    if(!!config){
+                        let keys = Object.keys(config);
+                        for(let i=0;i<keys.length;i++){
+                            let key = keys[i];
+                            if(key=="headers"){
+                                let headers = fetchArgs.secondArg[key];
+                                // @ts-ignore
+                                config[key].forEach((v,k)=>{ headers.push([k,v]); });
+                                if(headers.length>0){ fetchArgs.secondArg[key] = headers; }
+                                continue;
+                            }
+                            fetchArgs.secondArg[key]=  fetchArgs.secondArg[key] || config[key];
+                        }
+                    }
+                    const msg = {
+                        type: 'network',
+                        requestFunc: 'fetch',
+                        fetArgs: fetchArgs
+                    };
+                    sendToRender(msg);
+                    //TODO: 转发fetch信息到Render,接收Render的消息,并返回Response对象
+                    originFetch.apply(this,[...arguments]).then(reseponse=>{
+                        res(reseponse);
+                    }).catch(typeError=>{
+                        rej(typeError);
+                    });
+                });
             }
         }
-
-        _replace(window, 'fetch', replaceFecch);
+        _replace(window, 'fetch', replaceFetch);
     }
 
     private hackXHR() {
@@ -149,12 +195,28 @@ export default class HttpObserver extends EventHub implements Observer {
         this.hackBeacon();
         this.hackFetch();
         this.hackXHR();
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("get", "htdd");
-        xhr.send(null);
+        this.test();
     }
+    private test(){
+        var myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'text/xml');
+        myHeaders.append('Vary', 'Accept-Language');
+        var myInit:RequestInit = { method: 'GET',
+            headers: myHeaders,
+            mode: 'cors',
+            cache: 'default'};
+        var myRequest = new Request('http://www.mocky.io/v2/5cdaa37f300000500068c8c8',{method:"POST"});
+        fetch(myRequest,myInit).then(function(response) {
+            console.log(response);
+        });
+        // fetch('http://www.mocky.io/v2/5cdaa37f300000500068c8c8').then(data=>{
+        //     console.log(data)
+        // });
 
+        // var xhr = new XMLHttpRequest();
+        // xhr.open("get", "htdd");
+        // xhr.send(null);
+    }
     public uninstall() {
         _unReplace(window.navigator, 'sendBeacon');
         _unReplace(window, 'fetch');
