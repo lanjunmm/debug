@@ -32,11 +32,25 @@ function start(){
     });
     // 发起Jsonp请求
     document.getElementById("reqJson").addEventListener('click',()=>{
+        let url="http://www.mocky.io/v2/5cdaa37f300000500068c8c8";
         let ele = document.createElement("script");
-        ele.src="http://www.mocky.io/v2/5cdaa37f300000500068c8c8";
-        ele.addEventListener('error',function (e) {
-            console.log(e)
-        });
+        ele.src = url;
+        // let attr = document.createAttribute('src');
+        // attr.value=url;
+        // ele.setAttributeNode(attr);
+        // ele["src"]="";
+        // for(let i=0;i<ele.attributes.length;i++){
+        //     if(ele.attributes[i].name=="src"){
+        //         ele.attributes[i].value = "http://www.mocky.io/v2/5cdaa37f300000500068c8c8";
+        //     }
+        // }
+        // ele.setAttribute('src','http://www.mocky.io/v2/5cdaa37f300000500068c8c8');
+        document.getElementsByTagName('body')[0].appendChild(ele);
+    });
+    document.getElementById("reqJson2").addEventListener('click',()=>{
+        let url2 = 'http://www.mocky.io/v2/5ce3e1d231000062387429e5';
+        let ele = document.createElement("script");
+        ele.src = url2;
         document.getElementsByTagName('body')[0].appendChild(ele);
     });
 
