@@ -15,9 +15,15 @@ export enum HttpFuncs {
     fetch = 'fetch',
     xhr = 'xhr'
 }
+export enum MessageTypes {
+    network = 'network',
+    jsonp = 'jsonp',
+    dom = 'dom'
+}
 export type HttpReqMsgs = {
     type:string
-    requestFunc: HttpFuncs
+    requestFunc: HttpFuncs,
+    reqId:any
     url?: string
     headers?: { [key: string]: any } // nonexistence in beacon request
     data?:any
@@ -26,6 +32,5 @@ export type HttpReqMsgs = {
     method?: string
     status?: number
     errmsg?: any
-    steps?: string,
-    reqId?: any
+    steps?: string
 }

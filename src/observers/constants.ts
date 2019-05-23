@@ -13,3 +13,5 @@ export const REQUESTINIT = {
         signal:  null,
         window: null
     };
+
+export const serverLocation = "http://localhost:3000/trans";

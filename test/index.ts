@@ -2,27 +2,40 @@ import Worker from '../src/index'
 
 function testNetwork(){
     let url = 'http://www.mocky.io/v2/5ce3e1d231000062387429e5';
-    var myHeaders = new Headers();
-    myHeaders.append('Content-Type', 'text/xml');
-    var myInit:RequestInit = { method: 'GET',
-        headers: myHeaders,
-        mode: 'cors',
-        cache: 'default'};
-    var myRequest = new Request(url,{method:"Get"});
-    fetch(myRequest,myInit).then(function(response) {
-        response.json().then(dataJson=>{
-            console.log(dataJson)
-        })
-    });
-    fetch(url).then(data=>{
-        data.json().then(dataJson=>{
-            console.log(dataJson)
-        })
-    });
+    // var myHeaders = new Headers();
+    // myHeaders.append('Content-Type', 'text/xml');
+    // var myInit:RequestInit = { method: 'GET',
+    //     headers: myHeaders,
+    //     mode: 'cors',
+    //     cache: 'default'};
+    // var myRequest = new Request(url,{method:"Get"});
+    // fetch(myRequest,myInit).then(function(response) {
+    //     console.log('fetch res: ',response);
+    //     // response.json().then(dataJson=>{
+    //     //     console.log(dataJson)
+    //     // })
+    // });
 
-    // var xhr = new XMLHttpRequest();
-    // xhr.open("get", "htdd");
-    // xhr.send(null);
+    // navigator.sendBeacon("url", "de");
+
+
+    // fetch(url).then(data=>{
+    //     data.json().then(dataJson=>{
+    //         console.log(dataJson)
+    //     })
+    // });
+
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange=function() {
+        if (xhr.readyState==4 && xhr.status==200)
+        {
+            console.log("接收xhr",xhr.responseText);
+        }
+    }
+    xhr.open("GET", url);//"http://localhost:3000/trans"
+    xhr.setRequestHeader("Content-Type","text/html")
+    xhr.send("wwww");
+
 }
 function start(){
     document.getElementById('addEle').addEventListener('click', () => {
@@ -34,23 +47,25 @@ function start(){
     document.getElementById("reqJson").addEventListener('click',()=>{
         let url="http://www.mocky.io/v2/5cdaa37f300000500068c8c8";
         let ele = document.createElement("script");
-        ele.src = url;
-        // let attr = document.createAttribute('src');
-        // attr.value=url;
-        // ele.setAttributeNode(attr);
-        // ele["src"]="";
+
+        let attr = document.createAttribute('src');
+        attr.value=url;
+        ele.setAttributeNode(attr);
+
+        // ele.src="";
+        // console.log(ele.attributes)
         // for(let i=0;i<ele.attributes.length;i++){
         //     if(ele.attributes[i].name=="src"){
-        //         ele.attributes[i].value = "http://www.mocky.io/v2/5cdaa37f300000500068c8c8";
+        //         ele.attributes[i].value = url;
         //     }
         // }
-        // ele.setAttribute('src','http://www.mocky.io/v2/5cdaa37f300000500068c8c8');
         document.getElementsByTagName('body')[0].appendChild(ele);
     });
     document.getElementById("reqJson2").addEventListener('click',()=>{
         let url2 = 'http://www.mocky.io/v2/5ce3e1d231000062387429e5';
         let ele = document.createElement("script");
         ele.src = url2;
+        // ele.setAttribute('src',url);
         document.getElementsByTagName('body')[0].appendChild(ele);
     });
 

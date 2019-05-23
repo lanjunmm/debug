@@ -1,6 +1,7 @@
 import Jsonp from './observers/jsonp'
 import HttpObserver from './observers/http'
 import { Observer } from './interfaces/observer'
+import socket from './utils/socket'
 
 export default class Worker {
     observers = {
@@ -17,9 +18,16 @@ export default class Worker {
         this.observers.jsonp=new Jsonp();
         this.observers.http=new HttpObserver();
     }
+    public connect(){
+        console.log(socket)
+        if(socket){
+            console.log("发送");
+            socket.emit('message', 'world');
+        }
+    }
     public start(){
-        console.log('start');
         // hack
+        this.connect();
         Object.keys(this.observers).forEach(observerName => {
             if (this.observers[observerName]!=null) {
                 (this.observers[observerName] as Observer).install();
