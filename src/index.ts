@@ -19,7 +19,6 @@ export default class Worker {
         this.observers.http=new HttpObserver();
     }
     public connect(){
-        console.log(socket)
         if(socket){
             console.log("发送");
             socket.emit('message', 'world');

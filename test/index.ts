@@ -16,20 +16,20 @@ function testNetwork(){
     //     // })
     // });
 
-    // navigator.sendBeacon("url", "de");
+    let status = navigator.sendBeacon(url, "de");
+    console.log("Beacon status",status);
 
-
-    // fetch(url).then(data=>{
-    //     data.json().then(dataJson=>{
-    //         console.log(dataJson)
-    //     })
-    // });
+    fetch(url).then(data=>{
+        data.text().then(dataJson=>{
+            console.log("Fetch收到Server：",dataJson)
+        })
+    });
 
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange=function() {
         if (xhr.readyState==4 && xhr.status==200)
         {
-            console.log("接收xhr",xhr.responseText);
+            console.log("xhr收到Server：",xhr.responseText);
         }
     }
     xhr.open("GET", url);//"http://localhost:3000/trans"

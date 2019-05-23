@@ -30,8 +30,10 @@ export default class Jsonp extends EventHub implements Observer{
                         taName: ele.tagName.toLowerCase(),
                         src: arguments[1]
                     };
-                    // TODO:转发script标签信息到Render,接收Render的消息
-                    sendToRender(msg);
+                    // 转发script标签信息到Render,接收Render的消息
+                    sendToRender(msg).then(data=>{
+                        console.log("jsonp收到Server：",data);
+                    })
                     // originAttribute.apply(this,arguments);
                 }else {
                     originAttribute.apply(this,arguments);

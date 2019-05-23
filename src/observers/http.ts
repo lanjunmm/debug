@@ -1,8 +1,7 @@
 import EventHub from "../utils/eventHub";
 import {HttpFuncs, HttpReqMsgs, Observer, MessageTypes} from "../interfaces/observer";
 import {_newuuid, _replace, _unReplace} from '../utils/tools'
-import {sendToRender} from '../utils/requestRender'
-import {REQUESTINIT, serverLocation} from './constants'
+import {REQUESTINIT, SERVER} from './constants'
 import {isFunction} from '../utils/is'
 
 /**大致思路完成部分：Fetch
@@ -20,9 +19,10 @@ export default class HttpObserver extends EventHub implements Observer {
         if (!!navigator.sendBeacon) {
             return;
         }
-
+        let that = this;
         function replaceBeacon(originalBeacon) {
             return function (this: Navigator, url: string, data) {
+                const requestId = _newuuid();
                 const msg: HttpReqMsgs = {
                     type: MessageTypes.network,
                     requestFunc: HttpFuncs.beacon,
@@ -30,24 +30,24 @@ export default class HttpObserver extends EventHub implements Observer {
                         url: url,
                         data: data
                     },
-                    reqId: _newuuid()
+                    reqId: requestId
                 };
-                sendToRender(msg);
-                originalBeacon.call(this, url, data);
+                that.ReqMap.set(requestId, msg);
+                originalBeacon.call(this, SERVER.HttpNetwork, JSON.stringify(msg));
             }
         }
-
         _replace(window.navigator, "sendBeacon", replaceBeacon);
     }
 
     private hackFetch() {
+        let that = this;
         if (!(window.fetch && window.fetch.toString().includes('native'))) {
             return;
         }
 
         function replaceFetch(originFetch) { //originFetch
             return function (input: string | Request, config?: RequestInit) {
-                return new Promise((res, rej) => {
+                // return new Promise((res, rej) => {
                     let fetchArgs = {
                         firstArg: {
                             type: "",
@@ -96,34 +96,22 @@ export default class HttpObserver extends EventHub implements Observer {
                             fetchArgs.secondArg[key] = config[key] || fetchArgs.secondArg[key];
                         }
                     }
+                    const requestId= _newuuid();
                     const msg: HttpReqMsgs = {
                         type: MessageTypes.network,
                         requestFunc: HttpFuncs.fetch,
                         data: fetchArgs,
-                        reqId: _newuuid()
+                        reqId: requestId
                     };
-                    sendToRender(msg).then((data?: BodyInit) => {
-                        console.log("fetch:", data);
-                        res(data);
-                        // if(data){
-                        //     // @ts-ignore
-                        //     let myResponse = new Response(data,{
-                        //         status:200,
-                        //         statusText:"ok"
-                        //     });
-                        //     res(myResponse);
-                        // }else {
-                        //     let typeErr = new TypeError(String(data));
-                        //     rej(typeErr);
-                        // }
-                    });
+                    that.ReqMap.set(requestId, msg);
                     //TODO: 转发fetch信息到Render,接收Render的消息,并返回Response对象
-                    originFetch.apply(this, [...arguments]).then((reseponse: Response) => {
-                        res(reseponse);
-                    }).catch(typeError => {
-                        rej(typeError);
-                    });
-                });
+                    return originFetch.apply(this,[SERVER.HttpNetwork,{
+                        body:JSON.stringify(msg),
+                        headers: {
+                            'content-type': 'application/json',
+                        },
+                        method: 'POST'
+                    }]);
             }
         }
 
@@ -134,7 +122,7 @@ export default class HttpObserver extends EventHub implements Observer {
         let that = this;
 
         function replaceXHROpen(originOpen) {
-            return function (this, method, url, async = false) {
+            return function (this, method, url, async = true) {
                 this.__local__ = false;
                 let location = url.match(that.urlMatch);
                 if (location != null && (location[2] == "localhost" || location[2] == "127.0.0.1") && (location[4] == "sockjs-node" || location[4] == "socket.io")) {
@@ -151,28 +139,24 @@ export default class HttpObserver extends EventHub implements Observer {
                             url,
                             method,
                             async,
-                            header: {},
+                            headers: {},
                             body: null
                         },
                         reqId: requestId
                     };
                     that.ReqMap.set(requestId, msg);
-                    // sendToRender(msg);
-                    /** 拿到Render的数据之后，将数据存在本地，open方法请求本地文件，文件名为requestid
-                     * */
                     // return originOpen.apply(this, arguments);//arguments
-                    return originOpen.apply(this, ["POST", serverLocation, async]);//arguments
+                    return originOpen.apply(this, ["POST", SERVER.HttpNetwork, async]);//arguments
                 }
             }
         }
 
         function replaceXHRSetRequestHeader(originSet) {
-            let that = this;
             return function (this, key: string, value: any) {
                 if (this.__local__) {
                     originSet.apply(this, [...arguments]);
                 } else {
-                    const requestId = this.__id__
+                    const requestId = this.__id__;
                     const record = that.ReqMap.get(requestId)
                     if (record) {
                         record.data.headers[key] = value
@@ -217,16 +201,14 @@ export default class HttpObserver extends EventHub implements Observer {
                         thisXHR.onreadystatechange = onreadystatechangeHandler
                     }
                     try {
-                        sendToRender(record);
                         return originSend.call(this, body);
                     } catch (e) {
-                        console.log(e);
+                        console.error(e);
                     }
                 }
 
             }
         }
-
         const XHRProto = XMLHttpRequest.prototype;
         _replace(XHRProto, 'setRequestHeader', replaceXHRSetRequestHeader)
         _replace(XHRProto, 'open', replaceXHROpen)

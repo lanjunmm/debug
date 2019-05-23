@@ -14,4 +14,7 @@ export const REQUESTINIT = {
         window: null
     };
 
-export const serverLocation = "http://localhost:3000/trans";
+export const SERVER = {
+    HttpHost: "http://localhost:3000",
+    HttpNetwork: "http://localhost:3000/trans"
+}
