@@ -24,9 +24,10 @@ app.get('/tranfer', function(req, res) {
 });
 
 app.post('/trans', function(req, res) {
-    console.log('post:');
+    console.log('post');
     req.on("data",(data)=>{
         // Socket.emit("message","mock response")
+        console.log(data)
         res.send('xhr response');
     })
 });
@@ -42,7 +43,10 @@ io.on('connection', function(socket) {
     console.log('a user connected');
     socket.on('message', function(data) {
         console.log('Client-message: ',data);
-    })
+    });
+    socket.on('jsonp', function(data) {
+        socket.emit('jsonp', data.type || "a jsonp response msg from server");
+    });
     socket.on('network', function(data) {
         console.log('Client-network: ',data.type || data);
         if(!!data.type && data.type==="network"){
