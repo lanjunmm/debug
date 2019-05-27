@@ -16,5 +16,8 @@ export const REQUESTINIT = {
 
 export const SERVER = {
     HttpHost: "http://localhost:3000",
-    HttpNetwork: "http://localhost:3000/trans"
-}
+    SocketHost:'ws://localhost:3000',
+    HttpNetwork: "http://localhost:3000/network"
+};
+export const RECORDER_ID: string = 'recorder-id'
+

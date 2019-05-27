@@ -64,14 +64,18 @@ function start(){
     document.getElementById("reqJson2").addEventListener('click',()=>{
         let url2 = 'http://www.mocky.io/v2/5ce3e1d231000062387429e5';
         let ele = document.createElement("script");
-        ele.src = url2;
-        // ele.setAttribute('src',url);
+        // ele.src = url2;
+        ele.setAttribute('src',url2);
         document.getElementsByTagName('body')[0].appendChild(ele);
-    });
 
-    let worker = new Worker();
-    worker.start();
+        // let img = document.createElement("img");
+        // img.setAttribute('src',"https://ss1.baidu.com/9vo3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=77d1cd475d43fbf2da2ca023807fca1e/9825bc315c6034a8ef5250cec5134954082376c9.jpg");
+        // document.getElementsByTagName('body')[0].appendChild(img);
+    });
     testNetwork();
 }
 
 document.addEventListener('DOMContentLoaded', start);
+
+let worker = new Worker();
+worker.start();

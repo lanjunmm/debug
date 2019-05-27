@@ -1,11 +1,9 @@
 import EventHub from "../utils/eventHub";
-import {HttpFuncs, HttpReqMsgs, Observer, MessageTypes} from "../interfaces/observer";
+import {HttpFuncs, HttpReqMsgs, Observer, MessageTypes,FetchArguments} from "../interfaces/observer";
 import {_newuuid, _replace, _unReplace} from '../utils/tools'
 import {REQUESTINIT, SERVER} from './constants'
 import {isFunction} from '../utils/is'
 
-/**大致思路完成部分：Fetch
- * */
 export default class HttpObserver extends EventHub implements Observer {
     private ReqMap: Map<string, HttpReqMsgs> = new Map();
     // private urlMatch = /(\w+):\/\/([^/:]+)(:\d*)?([^# ]*)/;
@@ -15,13 +13,14 @@ export default class HttpObserver extends EventHub implements Observer {
         super()
     }
 
+    /*hijack sendBeacon：将sendBeacon的url,data发到Server*/
     private hackBeacon() {
         if (!!navigator.sendBeacon) {
             return;
         }
         let that = this;
         function replaceBeacon(originalBeacon) {
-            return function (this: Navigator, url: string, data) {
+            return function (this: Navigator, url: string, data?:any) :boolean{
                 const requestId = _newuuid();
                 const msg: HttpReqMsgs = {
                     type: MessageTypes.network,
@@ -33,29 +32,31 @@ export default class HttpObserver extends EventHub implements Observer {
                     reqId: requestId
                 };
                 that.ReqMap.set(requestId, msg);
-                originalBeacon.call(this, SERVER.HttpNetwork, JSON.stringify(msg));
+                return originalBeacon.call(this, SERVER.HttpNetwork, JSON.stringify(msg));
             }
         }
         _replace(window.navigator, "sendBeacon", replaceBeacon);
     }
 
+    /*hijack sendBeacon：fetch方法的url和d配置参数发到Server*/
     private hackFetch() {
         let that = this;
-        if (!(window.fetch && window.fetch.toString().includes('native'))) {
-            return;
-        }
+        if (!(window.fetch && window.fetch.toString().includes('native'))) { return; }
 
         function replaceFetch(originFetch) { //originFetch
-            return function (input: string | Request, config?: RequestInit) {
+            return function (input: string | Request, config?: RequestInit): Promise<Response> {
                 // return new Promise((res, rej) => {
-                    let fetchArgs = {
+                // the argument's type and value
+                    let fetchArgs:FetchArguments = {
                         firstArg: {
                             type: "",
-                            url: null
+                            url: ""
                         },
                         secondArg: null
                     };
 
+                    //if the first one argument--input's type is Request,
+                    // then get Request's attributes(key,value) as the second argument to render fetch
                     if (typeof input === 'string') {
                         fetchArgs.firstArg.type = "url";
                         fetchArgs.firstArg.url = input;
@@ -104,7 +105,7 @@ export default class HttpObserver extends EventHub implements Observer {
                         reqId: requestId
                     };
                     that.ReqMap.set(requestId, msg);
-                    //TODO: 转发fetch信息到Render,接收Render的消息,并返回Response对象
+                    // 调用原生fetch方法，转发fetch信息到Server,接收Server的消息
                     return originFetch.apply(this,[SERVER.HttpNetwork,{
                         body:JSON.stringify(msg),
                         headers: {
@@ -118,11 +119,12 @@ export default class HttpObserver extends EventHub implements Observer {
         _replace(window, 'fetch', replaceFetch);
     }
 
+    /*hijack XMLHttpRequest：xhr方法的url和header等信息发到Server*/
     private hackXHR() {
         let that = this;
 
         function replaceXHROpen(originOpen) {
-            return function (this, method, url, async = true) {
+            return function (this, method, url, async = true):void {
                 this.__local__ = false;
                 let location = url.match(that.urlMatch);
                 if (location != null && (location[2] == "localhost" || location[2] == "127.0.0.1") && (location[4] == "sockjs-node" || location[4] == "socket.io")) {
@@ -134,7 +136,6 @@ export default class HttpObserver extends EventHub implements Observer {
                     let msg: HttpReqMsgs = {
                         type: MessageTypes.network,
                         requestFunc: HttpFuncs.xhr,
-                        steps: "open",
                         data: {
                             url,
                             method,
@@ -152,7 +153,7 @@ export default class HttpObserver extends EventHub implements Observer {
         }
 
         function replaceXHRSetRequestHeader(originSet) {
-            return function (this, key: string, value: any) {
+            return function (this, key: string, value: any):void {
                 if (this.__local__) {
                     originSet.apply(this, [...arguments]);
                 } else {
@@ -167,7 +168,7 @@ export default class HttpObserver extends EventHub implements Observer {
         }
 
         function replaceXHRSend(originSend) {
-            return function (this, body) {
+            return function (this, body?: Document | BodyInit | null):void{
                 if (this.__local__) {
                     originSend.apply(this, [...arguments]);
                 }
@@ -180,11 +181,10 @@ export default class HttpObserver extends EventHub implements Observer {
                     }
 
                     function onreadystatechangeHandler(): void {
-                        console.log("onreadystatechangeHandler");
+                        console.log("onreadystatechangeHandler,readyState:",this.readyState);
                     }
 
                     // TODO: hijack xhr.onerror, xhr.onabort, xhr.ontimeout
-                    // TODO: onreadystateChange方法将在xhr.readyState改变后调用----> 改为，接收到Render的readyState改变的消息后调用
                     if ('onreadystatechange' in thisXHR && isFunction(thisXHR.onreadystatechange)) {
                         _replace(thisXHR, 'onreadystatechange', originalStateChangeHook => {
                             return (...args) => {

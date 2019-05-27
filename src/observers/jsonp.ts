@@ -1,7 +1,7 @@
 import EventHub from '../utils/eventHub'
-import {Observer} from '../interfaces/observer'
+import {Observer,JSONPArguments} from '../interfaces/observer'
 import {_replace,_unReplace} from '../utils/tools'
-import { sendToRender } from '../utils/requestRender'
+import { sendToServer } from '../utils/requestServer'
 
 export default class Jsonp extends EventHub implements Observer{
     constructor(){
@@ -9,41 +9,40 @@ export default class Jsonp extends EventHub implements Observer{
     }
     private hackCreateElement() {
         let replaceCreateElement = (originalFunc)=>{
-            return (tag)=>{
-                let element = originalFunc.call(document, tag);
-                if (tag.toLowerCase() === 'script') {
+            return (tagName: string, options?: ElementCreationOptions): HTMLElement=>{
+                let element = originalFunc.apply(document,[tagName,options]);
+                if (tagName.toLowerCase() === 'script') {
                     this.hackScriptNode(element);
                 }
                 return element;
             }
-        }
+        };
         _replace(document,'createElement',replaceCreateElement);
     }
     private hackScriptNode(element) {
         function replaceSetAttribute(originAttribute) {
-            return function () {
+            return function () : void{
                 let ele = this;
                 let mayJsonp = ((ele instanceof Element) && (ele.tagName.toLowerCase() === "script")&&(arguments[0]==="src"));
                 if (mayJsonp) {
-                    let msg = {
+                    let msg:JSONPArguments = {
                         type: "jsonp",
                         taName: ele.tagName.toLowerCase(),
                         src: arguments[1]
                     };
-                    // 转发script标签信息到Render,接收Render的消息
-                    sendToRender(msg).then(data=>{
+                    // socket: 转发script标签信息到Render,接收Render的消息
+                    sendToServer('jsonp',msg).then(data=>{
                         console.log("jsonp收到Server：",data);
-                    })
-                    // originAttribute.apply(this,arguments);
+                    });
                 }else {
                     originAttribute.apply(this,arguments);
                 }
             }
         }
-        _replace(element.__proto__,'setAttribute',replaceSetAttribute);
+        _replace(element,'setAttribute',replaceSetAttribute); // element.__proto__ ---> element
 
         let src=undefined;
-        Object.defineProperty(element.__proto__, 'src', {
+        Object.defineProperty(element, 'src', {
             get: function(){
                 return src;
             },
@@ -64,7 +63,7 @@ export default class Jsonp extends EventHub implements Observer{
                 }
             }
         }
-        _replace(element.__proto__,'setAttributeNode',replaceSetAttibuteNode);
+        _replace(element,'setAttributeNode',replaceSetAttibuteNode);
 
         //TODO: element.attributes属性,以及setNamedItem
     }
