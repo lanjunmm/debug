@@ -23,11 +23,10 @@ app.get('/tranfer', function(req, res) {
     res.send('.');
 });
 
-app.post('/trans', function(req, res) {
+app.post('/network', function(req, res) {
     console.log('post');
     req.on("data",(data)=>{
         // Socket.emit("message","mock response")
-        console.log(data)
         res.send('xhr response');
     })
 });
@@ -41,18 +40,25 @@ const io = require('socket.io')(http,{transports:['polling','websocket']});//'po
 io.on('connection', function(socket) {
     Socket=socket;
     console.log('a user connected');
+    socket.emit("message","测试Emit");
     socket.on('message', function(data) {
         console.log('Client-message: ',data);
     });
     socket.on('jsonp', function(data) {
         socket.emit('jsonp', data.type || "a jsonp response msg from server");
     });
-    socket.on('network', function(data) {
-        console.log('Client-network: ',data.type || data);
-        if(!!data.type && data.type==="network"){
-            socket.emit('network', {id:data.reqId} || "a msg from server");
-        }else{
-            socket.emit('network', data.type || "a msg from server");
-        }
-    })
+    socket.on('event', function(data) {
+        socket.emit('event', data.type || "a event response msg from server");
+    });
+    socket.on('mutation', function(data) {
+        socket.emit('mutation', data.type || "a mutation response msg from server");
+    });
+    // socket.on('network', function(data) {
+    //     console.log('Client-network: ',data.type || data);
+    //     if(!!data.type && data.type==="network"){
+    //         socket.emit('network', {id:data.reqId} || "a msg from server");
+    //     }else{
+    //         socket.emit('network', data.type || "a msg from server");
+    //     }
+    // })
 })
