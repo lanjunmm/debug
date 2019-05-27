@@ -44,10 +44,12 @@ export default class Worker {
     private getSnapshot(){
         const { clientWidth: w, clientHeight: h } = document.documentElement
         const { x, y } = (this.observers.event as any).getScrollPosition()
+        const host = location.host;
         let firtstSnapShot =  {
             type: 'snapshot',
             scroll: { x, y },
             resize: { w, h},
+            referer:host,
             snapshot: snapShot.takeSnapshotForPage() // 第一次调用返回值是outerHtml
         }
         sendToServer('snapshot',firtstSnapShot).then(resData=>{
