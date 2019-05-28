@@ -56,7 +56,7 @@ export default class EventObserver extends EventHub implements Observer {
         const {target} = evt || {target: document}
         let record = {type: EventTypes.scroll} as EventReocrd
 
-        // 1. target is docuemnt
+        // 1. target is document
         // 2. No event invoking
         if (target === document || !target) {
             let {x, y} = this.getScrollPosition()
@@ -65,7 +65,6 @@ export default class EventObserver extends EventHub implements Observer {
             this.sendRecord(record);
             return
         }
-
 
         let targetX = target as ElementX;
         const {scrollLeft: x, scrollTop: y} = targetX;

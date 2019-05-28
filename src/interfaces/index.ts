@@ -2,6 +2,14 @@ import {Observer} from "./observer";
 
 export type ElementX = HTMLElement | Element
 
+export interface WORKER {
+    observers: Observers
+    options: any
+    debuging: boolean
+    start: () => void
+    stop: () => void
+}
+
 export interface FormELement extends HTMLElement {
     type: string
     value: string

@@ -42,7 +42,6 @@ export default class ConsoleObserver extends EventHub implements Observer {
             }
 
             this.sendRecord(record);
-
             if (originalConsoleFunc) {
               originalConsoleFunc.call(console, ...args)
             }

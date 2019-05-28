@@ -1,8 +1,8 @@
 import Jsonp from './observers/jsonp'
 import HttpObserver from './observers/http'
 import EventObserver from './observers/event'
-import { Observer } from './interfaces/observer'
-import { Observers } from './interfaces' //ObserverName,
+import {Observer } from './interfaces/observer'
+import {WORKER,ObserverName } from './interfaces'
 import socket from './utils/socket'
 import {_warn} from './utils/tools'
 import { sendToServer } from './utils/requestServer'
@@ -14,9 +14,8 @@ import ConsoleObserver from './observers/console'
 import ErrorObserver from './observers/error'
 import {RECORD_CONFIG} from './observers/constants'
 
-
-export default class Worker {
-    public observers:Observers = {
+export default class Worker implements WORKER{
+    public observers = {
         mutation: null,
         console: null,
         event: null,
@@ -24,7 +23,7 @@ export default class Worker {
         error: null,
         history: null,
         http: null,
-        jsonp:null,
+        jsonp:null
     }
     public debuging:boolean =false;
     public options = RECORD_CONFIG;
@@ -35,14 +34,16 @@ export default class Worker {
         }
         const { mutation, history, http, event, error, console: consoleOptions, mouse,jsonp } = this.options
 
-        this.observers.jsonp=new Jsonp(jsonp);
-        this.observers.http=new HttpObserver(http);
-        this.observers.event = new EventObserver(event);
-        this.observers.mutation = new DOMMutationObserver(mutation);
-        this.observers.mouse = new MouseObserver(mouse);
-        this.observers.history = new HistoryObserver(history);
-        this.observers.console = new ConsoleObserver(consoleOptions);
-        this.observers.error = new ErrorObserver(error);
+        this.observers = {
+            mutation: new DOMMutationObserver(mutation),
+            http: new HttpObserver(http),
+            console: new ConsoleObserver(consoleOptions),
+            event: new EventObserver(event),
+            mouse: new MouseObserver(mouse),
+            error: new ErrorObserver(error),
+            history: new HistoryObserver(history),
+            jsonp: new Jsonp(jsonp)
+        }
 
         // Object.keys(this.observers).forEach((observerName: ObserverName) => {
         //     const observer = this.observers[observerName];
@@ -82,10 +83,24 @@ export default class Worker {
         this.connect();
         this.getSnapshot();
 
-        Object.keys(this.observers).forEach(observerName => {
+        Object.keys(this.observers).forEach((observerName:ObserverName) => {
             if (this.observers[observerName]!=null) {
                 (this.observers[observerName] as Observer).install();
             }
+        })
+    }
+    public stop = (): void => {
+        if (!this.debuging) {
+            _warn('worker not started')
+            return
+        }
+        this.debuging = false
+        this.uninstallObservers();
+    }
+    public uninstallObservers = (): void => {
+        // walk and uninstall observers
+        Object.keys(this.observers).forEach((observerName:ObserverName) => {
+            ;(this.observers[observerName] as Observer).uninstall()
         })
     }
 }

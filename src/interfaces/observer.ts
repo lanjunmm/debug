@@ -1,7 +1,8 @@
 import { ElementX } from './index'
 
 export type Observer = {
-    install(): void
+    options?: boolean | object
+    install(options?: object): void
     uninstall(): void
 } & PubSubPattern
 
