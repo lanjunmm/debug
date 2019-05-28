@@ -61,3 +61,30 @@ export function _newuuid(): string {
         .toString(16)
         .split('.')[1]
 }
+
+export function _parseURL(
+    href: string = location.href
+): {
+    host?: string
+    path?: string
+    protocol?: string
+    query?: string
+    fragment?: string
+    relative?: string
+} {
+    const match = href.match(/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$/)
+
+    if (!match) return {}
+
+    const query = match[6] || ''
+    const fragment = match[8] || ''
+
+    return {
+        protocol: match[2],
+        host: match[4],
+        path: match[5],
+        query,
+        fragment,
+        relative: match[5] + query + fragment
+    }
+}

@@ -77,5 +77,5 @@ function start(){
 
 document.addEventListener('DOMContentLoaded', start);
 
-let worker = new Worker();
+let worker = new Worker({mouse:{mousemove:false}});
 worker.start();

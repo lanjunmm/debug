@@ -3,7 +3,7 @@ import { RECORDER_ID } from './constants'
 import snapShot from '../utils/SnapShot'
 import { _log, _warn } from '../utils/tools'
 import EventHub from "../utils/eventHub";
-import { Observer, DOMMutationRecord, DOMMutationTypes, NodeMutationData } from '../interfaces/observer'
+import { Observer, DOMMutationRecord, DOMMutationTypes, NodeMutationData,MessageTypes } from '../interfaces/observer'
 import { sendToServer } from '../utils/requestServer'
 
 
@@ -16,9 +16,9 @@ const { getRecordIdByElement } = snapShot
 export default class DOMMutationObserver extends EventHub implements Observer {
   private observer: MutationObserver
 
-  constructor() {
+  constructor(options: boolean) {
     super()
-
+    if (options === false) return
   }
 
   // when node's attribute change
@@ -246,7 +246,7 @@ export default class DOMMutationObserver extends EventHub implements Observer {
         if (DOMMutationRecord) {
             //TODO: 重复内容的处理
             // console.log(DOMMutationRecord);
-            sendToServer('mutation',DOMMutationRecord).then(resData=>{
+            sendToServer(MessageTypes.mutation,DOMMutationRecord).then(resData=>{
               console.log("mutation: ",resData);
             })
         }

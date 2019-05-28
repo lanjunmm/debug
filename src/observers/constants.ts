@@ -21,3 +21,35 @@ export const SERVER = {
 };
 export const RECORDER_ID: string = 'recorder-id'
 
+export const RECORD_CONFIG = {
+    mutation: true,
+    history: true,
+    error: {
+        jserror: true,
+        unhandledrejection: true
+    },
+    console: {
+        info: true,
+        error: true,
+        log: false,
+        warn: true,
+        debug: true
+    },
+    event: {
+        scroll: true,
+        resize: true,
+        form: true
+    },
+    http: {
+        xhr: true,
+        fetch: true,
+        beacon: true
+    },
+    mouse: {
+        click: true,
+        mousemove: true
+    },
+    jsonp:true
+}
+
+

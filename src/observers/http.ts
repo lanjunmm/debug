@@ -1,16 +1,23 @@
 import EventHub from "../utils/eventHub";
-import {HttpFuncs, HttpReqMsgs, Observer, MessageTypes,FetchArguments} from "../interfaces/observer";
-import {_newuuid, _replace, _unReplace} from '../utils/tools'
-import {REQUESTINIT, SERVER} from './constants'
+import {HttpFuncs, HttpReqMsgs, Observer, MessageTypes,FetchArguments,HttpOptions} from "../interfaces/observer";
+import {_newuuid, _replace, _unReplace,_log} from '../utils/tools'
+import {REQUESTINIT, SERVER,RECORD_CONFIG} from './constants'
 import {isFunction} from '../utils/is'
 
 export default class HttpObserver extends EventHub implements Observer {
     private ReqMap: Map<string, HttpReqMsgs> = new Map();
+    public options: HttpOptions = RECORD_CONFIG.http
     // private urlMatch = /(\w+):\/\/([^/:]+)(:\d*)?([^# ]*)/;
     private urlMatch = /(\w+):\/\/([^/:]+)(:\d*)?\/([^]+)\/([^# ]*)/;
 
-    constructor() {
+    constructor(options?: any) {
         super()
+        if (typeof options === 'boolean' && options === false) {
+            return
+        }
+        if (typeof options === 'object') {
+            this.options = { ...this.options, ...options }
+        }
     }
 
     /*hijack sendBeacon：将sendBeacon的url,data发到Server*/
@@ -216,9 +223,19 @@ export default class HttpObserver extends EventHub implements Observer {
     }
 
     public install() {
-        this.hackBeacon();
-        this.hackFetch();
-        this.hackXHR();
+        const { beacon, fetch, xhr } = this.options
+         if (beacon) {
+             this.hackBeacon()
+         }
+
+        if (fetch) {
+            this.hackFetch()
+        }
+
+        if (xhr) {
+            this.hackXHR()
+        }
+        _log('http observer ready!')
     }
 
     public uninstall() {

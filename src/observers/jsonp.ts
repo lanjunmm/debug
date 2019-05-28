@@ -1,11 +1,12 @@
 import EventHub from '../utils/eventHub'
-import {Observer,JSONPArguments} from '../interfaces/observer'
+import {Observer,JSONPArguments,MessageTypes} from '../interfaces/observer'
 import {_replace,_unReplace} from '../utils/tools'
 import { sendToServer } from '../utils/requestServer'
 
 export default class Jsonp extends EventHub implements Observer{
-    constructor(){
+    constructor(options:boolean){
         super();
+        if (options === false) return
     }
     private hackCreateElement() {
         let replaceCreateElement = (originalFunc)=>{
@@ -31,7 +32,7 @@ export default class Jsonp extends EventHub implements Observer{
                         src: arguments[1]
                     };
                     // socket: 转发script标签信息到Render,接收Render的消息
-                    sendToServer('jsonp',msg).then(data=>{
+                    sendToServer(MessageTypes.jsonp,msg).then(data=>{
                         console.log("jsonp收到Server：",data);
                     });
                 }else {

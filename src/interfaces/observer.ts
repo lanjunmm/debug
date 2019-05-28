@@ -5,6 +5,16 @@ export type Observer = {
     uninstall(): void
 } & PubSubPattern
 
+export enum HistoryTypes {
+    history = 'history'
+}
+export type HistoryRecord = {
+    type: HistoryTypes
+    func:string // which function
+    from: string // beacon record has no id
+    to: string
+}
+
 export type PubSubPattern = {
     queue: Map<string, Function[]>
     $on(hook: string, action: Function): void
@@ -17,10 +27,21 @@ export enum HttpFuncs {
     fetch = 'fetch',
     xhr = 'xhr'
 }
+export type HttpOptions = {
+    beacon?: boolean
+    fetch?: boolean
+    xhr?: boolean
+}
 export enum MessageTypes {
     network = 'network',
     jsonp = 'jsonp',
-    dom = 'dom'
+    mutation = 'mutation',
+    console='console' ,
+    event='event' ,
+    mouse='mouse' ,
+    error='error' ,
+    history='history' ,
+    snapshot='snapshot'
 }
 export type HttpReqMsgs = {
     type:string
@@ -101,4 +122,48 @@ export interface NodeMutationData {
     /* index and html here only when it was an add operation */
 
     html?: string // addnode's html or text
+}
+
+export type MouseReocrd = {
+    type: MouseTypes
+    x?: number
+    y?: number
+}
+export enum MouseTypes {
+    click = 'click',
+    move = 'move'
+}
+
+export enum ConsoleLevels {
+    info = 'info',
+    error = 'error',
+    log = 'log',
+    warn = 'warn',
+    debug = 'debug'
+}
+
+export type ConsoleRecord = {
+    type: 'console'
+    level: ConsoleLevels // console level,
+    input?: any[]
+}
+
+export enum ErrorTypes {
+    jserr = 'jserr',
+    unhandledrejection = 'unhandledrejection'
+}
+
+export type ErrorOptions = {
+    jserror: boolean
+    unhandledrejection: boolean
+}
+
+export type ErrorRecord = {
+    type: ErrorTypes
+    msg: string
+    // fields below existed only when type === jserr
+    url?: string
+    line?: string
+    err?: any
+    stack?: string
 }

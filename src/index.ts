@@ -8,7 +8,11 @@ import {_warn} from './utils/tools'
 import { sendToServer } from './utils/requestServer'
 import snapShot from './utils/SnapShot'
 import DOMMutationObserver from './observers/mutation'
-
+import MouseObserver from './observers/mouse'
+import HistoryObserver from './observers/history'
+import ConsoleObserver from './observers/console'
+import ErrorObserver from './observers/error'
+import {RECORD_CONFIG} from './observers/constants'
 
 
 export default class Worker {
@@ -23,11 +27,22 @@ export default class Worker {
         jsonp:null,
     }
     public debuging:boolean =false;
-    constructor(){
-        this.observers.jsonp=new Jsonp();
-        this.observers.http=new HttpObserver();
-        this.observers.event = new EventObserver();
-        this.observers.mutation = new DOMMutationObserver();
+    public options = RECORD_CONFIG;
+
+    constructor(options?){
+        if (options && typeof options === 'object') {
+            this.options = { ...this.options, ...options }
+        }
+        const { mutation, history, http, event, error, console: consoleOptions, mouse,jsonp } = this.options
+
+        this.observers.jsonp=new Jsonp(jsonp);
+        this.observers.http=new HttpObserver(http);
+        this.observers.event = new EventObserver(event);
+        this.observers.mutation = new DOMMutationObserver(mutation);
+        this.observers.mouse = new MouseObserver(mouse);
+        this.observers.history = new HistoryObserver(history);
+        this.observers.console = new ConsoleObserver(consoleOptions);
+        this.observers.error = new ErrorObserver(error);
 
         // Object.keys(this.observers).forEach((observerName: ObserverName) => {
         //     const observer = this.observers[observerName];

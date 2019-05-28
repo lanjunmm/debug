@@ -1,17 +1,26 @@
 import EventHub from "../utils/eventHub";
-import {Observer, Listener, EventTypes, EventReocrd} from "../interfaces/observer";
+import {Observer, Listener, EventTypes, EventReocrd,MessageTypes} from "../interfaces/observer";
 import {ElementX, FormELement} from '../interfaces'
 import {_throttle, _log, _warn} from '../utils/tools'
 import {sendToServer} from '../utils/requestServer'
 import snapShot from '../utils/SnapShot'
+import {RECORD_CONFIG} from './constants'
 
 
 const {getRecordIdByElement} = snapShot
 export default class EventObserver extends EventHub implements Observer {
     public listeners: Listener[] = [];
+    public options = RECORD_CONFIG.event
 
-    constructor() {
+    constructor(options?: any) {
         super()
+        if (typeof options === 'boolean' && options === false) {
+            return
+        }
+
+        if (typeof options === 'object') {
+            this.options = { ...this.options, ...options }
+        }
     }
 
     public addListener = ({target, event, callback, options}: Listener, cb?: () => void) => {
@@ -29,7 +38,7 @@ export default class EventObserver extends EventHub implements Observer {
     }
 
     private sendRecord(record) {
-        sendToServer('event', record).then(resData => {
+        sendToServer(MessageTypes.event, record).then(resData => {
             console.log("event:", resData);
         });
     }
@@ -38,10 +47,8 @@ export default class EventObserver extends EventHub implements Observer {
     public getScrollPosition = (): { x: number; y: number } => {
         // Quirks "BackCompat" mode on the contrary （false is standardMode "CSS1Compat"
         const isStandardsMode = document.compatMode === 'CSS1Compat'
-
         const x = isStandardsMode ? document.documentElement.scrollLeft : document.body.scrollLeft
         const y = isStandardsMode ? document.documentElement.scrollTop : document.body.scrollTop
-
         return {x, y}
     }
 
@@ -107,33 +114,41 @@ export default class EventObserver extends EventHub implements Observer {
 
     public install(): void {
         const {addListener} = this;
-        addListener({
-            target: document,
-            event: 'scroll',
-            callback: this.getScroll,
-            options: true
-        });
-        addListener({
-            target: window,
-            event: 'resize',
-            callback: _throttle(this.getResize)
-        })
+        const { scroll, resize, form } = this.options
 
-        addListener({
-            target: document,
-            event: 'change',
-            callback: this.getFormChange,
-            options: true
-        })
+        if(scroll){
+            addListener({
+                target: document,
+                event: 'scroll',
+                callback: this.getScroll,
+                options: true
+            });
+        }
 
-        // input event fires when value of <input> <select> <textarea> element has been altered.
-        addListener({
-            target: document,
-            event: 'input',
-            callback: _throttle(this.getFormChange, 300),
-            options: true
-        })
+        if(resize){
+            addListener({
+                target: window,
+                event: 'resize',
+                callback: _throttle(this.getResize)
+            })
+        }
 
+        if(form){
+            addListener({
+                target: document,
+                event: 'change',
+                callback: this.getFormChange,
+                options: true
+            })
+
+            // input event fires when value of <input> <select> <textarea> element has been altered.
+            addListener({
+                target: document,
+                event: 'input',
+                callback: _throttle(this.getFormChange, 300),
+                options: true
+            })
+        }
         _log('events observer ready!')
     }
 
