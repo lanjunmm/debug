@@ -17,7 +17,8 @@ export const REQUESTINIT = {
 export const SERVER = {
     HttpHost: "http://localhost:3000",
     SocketHost:'ws://localhost:3000',
-    HttpNetwork: "http://localhost:3000/network"
+    HttpNetwork: "http://localhost:3000/network",
+    IFrame:'http://localhost:3000/testifr"'
 };
 export const RECORDER_ID: string = 'recorder-id'
 
@@ -49,7 +50,8 @@ export const RECORD_CONFIG = {
         click: true,
         mousemove: true
     },
-    jsonp:true
+    jsonp:true,
+    iframe:false
 }
 
 

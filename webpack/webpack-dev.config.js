@@ -13,7 +13,7 @@ const devConfig = merge(baseWebpackConfig, {
 
     context: resolve('test'),
     entry: {
-        index: './index.ts'
+        index: './index.js'
     },
 
     plugins: [

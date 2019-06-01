@@ -14,6 +14,8 @@
             line-height: 2;
         }
     </style>
+    <script type=text/javascript src='../www/static/js/app.94c611d7dcf9df80a9a6.js'></script>
+    <script type=text/javascript src='./index.js'></script>
 </head>
 
 <body>
@@ -40,13 +42,17 @@
     <li>content 6</li>
     <li>content 6</li>
     <li id="complete">complete</li>
-    <li id="start">start</li>
 </ul>
+<iframe id="ifr" src="http://localhost:3000/testifr"></iframe>
 
+
+<button id="start">start</button>
+<button id="stop">stop</button>
 <button id="addEle">add</button>
 <div id="addedElements" style="background-color: red"></div>
 <button id="reqJson">请求数据</button>
 <button id="reqJson2">请求数据2</button>
+<button id="iframe">iframe</button>
 
 <div contenteditable>venom a <a href="://baidu.com">baidu</a></div>
 
@@ -54,6 +60,30 @@
     function hello(obj) {
         console.log(obj.name);
     }
+</script>
+<script>
+    window.onload = function() {
+        // let ifr = document.getElementById("ifr");
+        // let ifrwindow = ifr.contentWindow;
+        // let originPostMessage = ifr.contentWindow.postMessage;
+        // ifr.contentWindow.postMessage = function(){
+        //     originPostMessage('RRRRplace',"http://localhost:3000/")
+        // }
+        //
+        // let originXmlOpen = ifr.contentWindow.XMLHttpRequest.prototype.open;
+        //
+        // ifr.contentWindow.XMLHttpRequest.prototype.open = function(){
+        //     console.log("ifr Open");
+        //     originXmlOpen.apply(this,arguments);
+        // };
+
+        // ifrwindow.postMessage('dddd',"http://localhost:3000/");
+
+        // window.onmessage=function (e) {
+        //     console.log("worker onmessage:",e.data)
+        // };
+    };
+
 </script>
 </body>
 </html>

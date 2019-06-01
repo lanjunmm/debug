@@ -30,7 +30,7 @@ export default class EventHub {
             return
         }
 
-        const index = Q.indexOf(thisAction)
+        const index = Q.indexOf(thisAction);
 
         if (index !== -1) {
             Q.splice(index, 1)

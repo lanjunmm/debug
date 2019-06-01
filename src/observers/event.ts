@@ -1,4 +1,3 @@
-import EventHub from "../utils/eventHub";
 import {Observer, Listener, EventTypes, EventReocrd,MessageTypes} from "../interfaces/observer";
 import {ElementX, FormELement} from '../interfaces'
 import {_throttle, _log, _warn} from '../utils/tools'
@@ -8,12 +7,11 @@ import {RECORD_CONFIG} from './constants'
 
 
 const {getRecordIdByElement} = snapShot
-export default class EventObserver extends EventHub implements Observer {
+export default class EventObserver implements Observer {
     public listeners: Listener[] = [];
     public options = RECORD_CONFIG.event
 
     constructor(options?: any) {
-        super()
         if (typeof options === 'boolean' && options === false) {
             return
         }

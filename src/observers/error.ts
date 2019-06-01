@@ -1,14 +1,12 @@
 import {_replace, _log, _unReplace} from '../utils/tools'
 import {RECORD_CONFIG} from './constants'
-import EventHub from '../utils/eventHub'
 import {Observer, ErrorOptions, ErrorRecord, ErrorTypes, MessageTypes} from '../interfaces/observer'
 import {sendToServer} from "../utils/requestServer";
 
-export default class ErrorObserver extends EventHub implements Observer {
+export default class ErrorObserver  implements Observer {
     public options: ErrorOptions = RECORD_CONFIG.error
 
     constructor(options?: any) {
-        super()
 
         if (typeof options === 'boolean' && options === false) {
             return
@@ -116,7 +114,7 @@ export default class ErrorObserver extends EventHub implements Observer {
             // TODO: protect recorder's onerror hook by defineProperty
             Object.defineProperty(window, 'onerror', {
                 set(newHook) {
-                    if (!newHook.__recorder__) {
+                    if (newHook!==null && !newHook.__replaced__) {
                         _log('recorder error handler died!')
                     }
                 }

@@ -2,7 +2,7 @@ import Jsonp from './observers/jsonp'
 import HttpObserver from './observers/http'
 import EventObserver from './observers/event'
 import {Observer } from './interfaces/observer'
-import {WORKER,ObserverName } from './interfaces'
+import {WORKER,ObserverName,Observers } from './interfaces'
 import socket from './utils/socket'
 import {_warn} from './utils/tools'
 import { sendToServer } from './utils/requestServer'
@@ -10,12 +10,14 @@ import snapShot from './utils/SnapShot'
 import DOMMutationObserver from './observers/mutation'
 import MouseObserver from './observers/mouse'
 import HistoryObserver from './observers/history'
+import IframeObserver from './observers/iframe'
 import ConsoleObserver from './observers/console'
 import ErrorObserver from './observers/error'
 import {RECORD_CONFIG} from './observers/constants'
 
+
 export default class Worker implements WORKER{
-    public observers = {
+    public observers:Observers = {
         mutation: null,
         console: null,
         event: null,
@@ -23,7 +25,8 @@ export default class Worker implements WORKER{
         error: null,
         history: null,
         http: null,
-        jsonp:null
+        jsonp:null,
+        iframe:null
     }
     public debuging:boolean =false;
     public options = RECORD_CONFIG;
@@ -32,8 +35,9 @@ export default class Worker implements WORKER{
         if (options && typeof options === 'object') {
             this.options = { ...this.options, ...options }
         }
-        const { mutation, history, http, event, error, console: consoleOptions, mouse,jsonp } = this.options
-
+    }
+    public initObservers(){
+        const { mutation, history, http, event, error, console: consoleOptions, mouse,jsonp,iframe } = this.options
         this.observers = {
             mutation: new DOMMutationObserver(mutation),
             http: new HttpObserver(http),
@@ -42,15 +46,9 @@ export default class Worker implements WORKER{
             mouse: new MouseObserver(mouse),
             error: new ErrorObserver(error),
             history: new HistoryObserver(history),
-            jsonp: new Jsonp(jsonp)
+            jsonp: new Jsonp(jsonp),
+            iframe:new IframeObserver(iframe)
         }
-
-        // Object.keys(this.observers).forEach((observerName: ObserverName) => {
-        //     const observer = this.observers[observerName];
-        //     if(observer!=null){
-        //         observer.$on('sendToServer', sendToServer);
-        //     }
-        // })
     }
     public connect(){
         if(socket){
@@ -66,7 +64,7 @@ export default class Worker implements WORKER{
             scroll: { x, y },
             resize: { w, h},
             referer:host,
-            snapshot: snapShot.takeSnapshotForPage() // 第一次调用返回值是outerHtml
+            snapshot: snapShot.takeSnapshotForPage() // 第一次调用返回值是<head>部分outerHtml
         }
         sendToServer('snapshot',firtstSnapShot).then(resData=>{
             console.log("snapShot: ",resData);
@@ -74,8 +72,10 @@ export default class Worker implements WORKER{
     }
     public start(){
         // hack
+        console.log("start")
+        this.initObservers();
         if (this.debuging) {
-            _warn('record already started')
+            _warn('worker already started')
             return
         }
 
@@ -104,3 +104,8 @@ export default class Worker implements WORKER{
         })
     }
 }
+
+/** 打包留出全局接口：*/
+// window['worker'] = function () {
+//     return new Worker();
+// }

@@ -4,7 +4,11 @@ export type Observer = {
     options?: boolean | object
     install(options?: object): void
     uninstall(): void
-} & PubSubPattern
+}
+
+export type SOCKET = {
+    socket?: any
+}
 
 export enum HistoryTypes {
     history = 'history'
@@ -16,12 +20,7 @@ export type HistoryRecord = {
     to: string
 }
 
-export type PubSubPattern = {
-    queue: Map<string, Function[]>
-    $on(hook: string, action: Function): void
-    $off(hook: string, thisAction: Function): void
-    $emit(hook: string, ...args): void
-}
+
 
 export enum HttpFuncs {
     beacon = 'beacon',
@@ -36,6 +35,7 @@ export type HttpOptions = {
 export enum MessageTypes {
     network = 'network',
     jsonp = 'jsonp',
+    iframe = 'iframe',
     mutation = 'mutation',
     console='console' ,
     event='event' ,
@@ -70,6 +70,13 @@ export type JSONPArguments = {
     taName: string,
     src: string
 };
+export type IFRAMEArguments = {
+    type: string,
+    targetOrigin: string
+    message: any,
+    transfer?:Transferable[]
+};
+
 
 export type Listener = {
     target: Window | Document | ElementX

@@ -1,4 +1,13 @@
+/** npm run dev 使用法*/
 import Worker from '../src/index'
+let worker = new Worker({mouse:{mousemove:false},iframe:false});
+worker.start();
+
+import {_replace} from "../src/utils/tools";
+
+/** 打包后调用法：*/
+// let worker = new window.worker();
+// worker.start();
 
 function testNetwork(){
     let url = 'http://www.mocky.io/v2/5ce3e1d231000062387429e5';
@@ -68,10 +77,23 @@ function start(){
         ele.setAttribute('src',url2);
         document.getElementsByTagName('body')[0].appendChild(ele);
     });
+    document.getElementById("start").addEventListener('click',()=>{
+        worker.start();
+    });
+    document.getElementById("stop").addEventListener('click',()=>{
+        worker.stop();
+    });
+    document.getElementById("iframe").addEventListener('click',()=>{
+        let url="http://localhost:3000/testifr";
+        let ele = document.createElement("iframe");
+        ele.src = url;
+        document.getElementsByTagName('body')[0].appendChild(ele);
+    });
+
     testNetwork();
 }
 
+
 document.addEventListener('DOMContentLoaded', start);
 
-let worker = new Worker({mouse:{mousemove:false}});
-worker.start();
+

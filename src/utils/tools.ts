@@ -39,7 +39,7 @@ export function _replace(source: object, name: string, replacement: (...args: an
 
     if (original) {
         // if original func existed
-        if (!(name in source)) return
+        if (!(name in source) || original.__replaced__) return
         doReplace()
         return
     } else if (original === null || original === undefined) {

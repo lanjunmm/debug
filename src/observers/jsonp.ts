@@ -1,11 +1,9 @@
-import EventHub from '../utils/eventHub'
 import {Observer,JSONPArguments,MessageTypes} from '../interfaces/observer'
-import {_replace,_unReplace} from '../utils/tools'
+import {_log, _replace, _unReplace} from '../utils/tools'
 import { sendToServer } from '../utils/requestServer'
 
-export default class Jsonp extends EventHub implements Observer{
+export default class Jsonp implements Observer{
     constructor(options:boolean){
-        super();
         if (options === false) return
     }
     private hackCreateElement() {
@@ -69,13 +67,13 @@ export default class Jsonp extends EventHub implements Observer{
         //TODO: element.attributes属性,以及setNamedItem
     }
 
-    private hackFunc(){
-        this.hackCreateElement();
-    }
     public install(){
-        this.hackFunc();
+        this.hackCreateElement();
+        _log('JsonP installed')
     }
     public uninstall(){
-        _unReplace(document,'setAttribute');
+        _unReplace(document,'createElement');
+        _unReplace(HTMLScriptElement,'setAttribute');
+        _unReplace(HTMLScriptElement,'setAttributeNode');
     }
 }

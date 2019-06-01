@@ -1,14 +1,12 @@
 import {_unReplace, _log, _parseURL, _replace} from '../utils/tools'
-import EventHub from '../utils/eventHub'
 import {Observer, HistoryRecord, HistoryTypes,MessageTypes} from '../interfaces/observer'
 import {sendToServer} from "../utils/requestServer";
 
-export default class HistoryObserver extends EventHub implements Observer {
+export default class HistoryObserver implements Observer {
     public status: boolean = false
     private lastHref: string
 
     constructor(options: boolean) {
-        super()
         if (options === false) return
     }
 

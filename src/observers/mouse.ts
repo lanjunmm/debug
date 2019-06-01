@@ -1,6 +1,5 @@
 import {MouseReocrd, MouseTypes, Observer, Listener,MessageTypes} from '../interfaces/observer'
 import {_throttle, _log, _warn} from '../utils/tools'
-import eventHub from '../utils/eventHub'
 import {sendToServer} from "../utils/requestServer";
 import {RECORD_CONFIG} from './constants'
 
@@ -8,12 +7,11 @@ import {RECORD_CONFIG} from './constants'
  * Observe mouse behavior
  * and produce an Record
  */
-export default class MouseObserver extends eventHub implements Observer {
+export default class MouseObserver  implements Observer {
     public listeners: Listener[] = []
     public options = RECORD_CONFIG.mouse
 
     constructor(options?: any) {
-        super()
         if (typeof options === 'boolean' && options === false) {
             return
         }

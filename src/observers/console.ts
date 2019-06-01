@@ -1,16 +1,14 @@
 import {Observer, ConsoleLevels, ConsoleRecord, MessageTypes} from '../interfaces/observer'
 import { _replace, _unReplace, _log } from '../utils/tools'
 import { RECORD_CONFIG } from './constants'
-import EventHub from '../utils/eventHub'
 import {sendToServer} from "../utils/requestServer";
 
-export default class ConsoleObserver extends EventHub implements Observer {
+export default class ConsoleObserver implements Observer {
   private consoleLevels = Object.keys(RECORD_CONFIG.console)
 
   public options = RECORD_CONFIG.console
 
   constructor(options?: any) {
-    super()
     if (typeof options === 'boolean' && options === false) {
       return
     }

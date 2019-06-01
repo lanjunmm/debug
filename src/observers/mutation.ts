@@ -2,7 +2,6 @@ import { MutationRecordX } from '../interfaces'
 import { RECORDER_ID } from './constants'
 import snapShot from '../utils/SnapShot'
 import { _log, _warn } from '../utils/tools'
-import EventHub from "../utils/eventHub";
 import { Observer, DOMMutationRecord, DOMMutationTypes, NodeMutationData,MessageTypes } from '../interfaces/observer'
 import { sendToServer } from '../utils/requestServer'
 
@@ -13,11 +12,10 @@ const { getRecordIdByElement } = snapShot
  * Observe DOM change such as DOM-add/remove text-change attribute-change
  * and generate an Record
  */
-export default class DOMMutationObserver extends EventHub implements Observer {
+export default class DOMMutationObserver implements Observer {
   private observer: MutationObserver
 
   constructor(options: boolean) {
-    super()
     if (options === false) return
   }
 

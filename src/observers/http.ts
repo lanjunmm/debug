@@ -1,17 +1,15 @@
-import EventHub from "../utils/eventHub";
 import {HttpFuncs, HttpReqMsgs, Observer, MessageTypes,FetchArguments,HttpOptions} from "../interfaces/observer";
 import {_newuuid, _replace, _unReplace,_log} from '../utils/tools'
 import {REQUESTINIT, SERVER,RECORD_CONFIG} from './constants'
 import {isFunction} from '../utils/is'
 
-export default class HttpObserver extends EventHub implements Observer {
+export default class HttpObserver implements Observer {
     private ReqMap: Map<string, HttpReqMsgs> = new Map();
     public options: HttpOptions = RECORD_CONFIG.http
     // private urlMatch = /(\w+):\/\/([^/:]+)(:\d*)?([^# ]*)/;
     private urlMatch = /(\w+):\/\/([^/:]+)(:\d*)?\/([^]+)\/([^# ]*)/;
 
     constructor(options?: any) {
-        super()
         if (typeof options === 'boolean' && options === false) {
             return
         }
