@@ -20,7 +20,7 @@ export default class HttpObserver implements Observer {
 
     /*hijack sendBeacon：将sendBeacon的url,data发到Server*/
     private hackBeacon() {
-        if (!!navigator.sendBeacon) {
+        if (!navigator.sendBeacon) {
             return;
         }
         let that = this;
@@ -37,10 +37,10 @@ export default class HttpObserver implements Observer {
                     reqId: requestId
                 };
                 that.ReqMap.set(requestId, msg);
-                return originalBeacon.call(this, SERVER.HttpNetwork, JSON.stringify(msg));
+                return originalBeacon.call(this, SERVER.HttpBeacon, JSON.stringify(msg));
             }
         }
-        _replace(window.navigator, "sendBeacon", replaceBeacon);
+        _replace(navigator, "sendBeacon", replaceBeacon);
     }
 
     /*hijack sendBeacon：fetch方法的url和d配置参数发到Server*/
@@ -111,7 +111,7 @@ export default class HttpObserver implements Observer {
                     };
                     that.ReqMap.set(requestId, msg);
                     // 调用原生fetch方法，转发fetch信息到Server,接收Server的消息
-                    return originFetch.apply(this,[SERVER.HttpNetwork,{
+                    return originFetch.apply(this,[SERVER.HttpFetch,{
                         body:JSON.stringify(msg),
                         headers: {
                             'content-type': 'application/json',
@@ -152,7 +152,7 @@ export default class HttpObserver implements Observer {
                     };
                     that.ReqMap.set(requestId, msg);
                     // return originOpen.apply(this, arguments);//arguments
-                    return originOpen.apply(this, ["POST", SERVER.HttpNetwork, async]);//arguments
+                    return originOpen.apply(this, ["POST", SERVER.HttpXhr, async]);//arguments
                 }
             }
         }
@@ -206,7 +206,7 @@ export default class HttpObserver implements Observer {
                         thisXHR.onreadystatechange = onreadystatechangeHandler
                     }
                     try {
-                        return originSend.call(this, body);
+                        return originSend.call(this, JSON.stringify(record));
                     } catch (e) {
                         console.error(e);
                     }

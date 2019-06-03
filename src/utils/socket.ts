@@ -17,11 +17,14 @@ import {SERVER} from '../observers/constants'
 // }
 
 let socket = io(SERVER.HttpHost,{transports:['polling','websocket']}); //'polling'
+let SocketID ="";
 socket.on('connect', function () {
     console.log("socket 连接成功");
 });
-socket.on('message', function (msg) {
-    console.log("message：",msg)
+socket.on('id', function (msg) {
+    console.log("id：",msg);
+    SocketID = msg;
+    socket.emit("id",{id:SocketID,name:"worker"});
 });
 
 export default socket;

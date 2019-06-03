@@ -17,7 +17,9 @@ export const REQUESTINIT = {
 export const SERVER = {
     HttpHost: "http://localhost:3000",
     SocketHost:'ws://localhost:3000',
-    HttpNetwork: "http://localhost:3000/network",
+    HttpFetch: "http://localhost:3000/fetch",
+    HttpXhr: "http://localhost:3000/xhr",
+    HttpBeacon: "http://localhost:3000/beacon",
     IFrame:'http://localhost:3000/testifr"'
 };
 export const RECORDER_ID: string = 'recorder-id'

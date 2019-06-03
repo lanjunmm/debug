@@ -18,7 +18,17 @@ export default class Jsonp implements Observer{
         };
         _replace(document,'createElement',replaceCreateElement);
     }
+    private createCallback(data){
+        console.log("jsonp收到Server：",data);
+        // let funcName = data.funcName;
+        // let args = data.args;
+        let ele  = document.createElement("script");
+        ele.innerHTML = data;
+        // ele.innerHTML = `${funcName}(${args})`;
+        document.body.appendChild(ele);
+    }
     private hackScriptNode(element) {
+        let that = this;
         function replaceSetAttribute(originAttribute) {
             return function () : void{
                 let ele = this;
@@ -31,7 +41,7 @@ export default class Jsonp implements Observer{
                     };
                     // socket: 转发script标签信息到Render,接收Render的消息
                     sendToServer(MessageTypes.jsonp,msg).then(data=>{
-                        console.log("jsonp收到Server：",data);
+                        that.createCallback(data);
                     });
                 }else {
                     originAttribute.apply(this,arguments);
