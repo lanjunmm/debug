@@ -118,7 +118,22 @@ function workerMsg(socket) {
     // })
 }
 
-function httpRes(reseponseObj,resData) {
+function fetchReseponse(reseponseObj,resData) {
+    if(reseponseObj!=null){
+        reseponseObj.status(resData.data.status);
+        reseponseObj.send(resData.data.body); //返回响应体
+        ReqMap.set(resData.reqId,null);
+    }
+}
+function xhrReseponse(reseponseObj,resData) {
+    if(reseponseObj!=null){
+        // reseponseObj.type = resData.data.responseType;
+        reseponseObj.status(resData.data.status);
+        reseponseObj.send(resData.data.response); //返回响应体
+        ReqMap.set(resData.reqId,null);
+    }
+}
+function beaconResponse(reseponseObj,resData) {
     if(reseponseObj!=null){
         reseponseObj.send(resData);
         ReqMap.set(resData.reqId,null);
@@ -129,15 +144,15 @@ function renderMsg(socket) {
     renderSocket = socket;
     renderSocket.on("fetch",function (fetchRes) {
         let reseponseObj = ReqMap.get(fetchRes.reqId);
-        httpRes(reseponseObj,fetchRes);
+        fetchReseponse(reseponseObj,fetchRes);
     });
     renderSocket.on("xhr",function (xhrRes) {
         let reseponseObj = ReqMap.get(xhrRes.reqId);
-        httpRes(reseponseObj,xhrRes);
+        xhrReseponse(reseponseObj,xhrRes);
     });
     renderSocket.on("beacon",function (beaconRes) {
         let reseponseObj = ReqMap.get(beaconRes.reqId);
-        httpRes(reseponseObj,beaconRes);
+        beaconResponse(reseponseObj,beaconRes);
     });
     renderSocket.on('jsonp',function (jsonpRes) {
         workerSocket.emit('jsonp', jsonpRes);
