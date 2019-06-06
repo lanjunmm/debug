@@ -97,25 +97,22 @@ function workerMsg(socket) {
         renderSocket.emit('jsonp',data);
     });
     workerSocket.on('event', function(data) {
-        workerSocket.emit('event', data.type || "a event response msg from server");
+        renderSocket.emit('event', data);
+        // workerSocket.emit('event', data.type || "a event response msg from server");
     });
     workerSocket.on('mutation', function(data) {
+        console.log('mutation');
+        renderSocket.emit('mutation', data);
         workerSocket.emit('mutation', data.type || "a mutation response msg from server");
     });
     workerSocket.on('snapshot', function(data) {
-        workerSocket.emit('snapshot', data.type || "a snapshot response msg from server");
+        renderSocket.emit('snapshot',data);
+        console.log('snapshot');
+        // workerSocket.emit('snapshot', data.type || "a snapshot response msg from server");
     });
     workerSocket.on('mouse', function(data) {
         workerSocket.emit('mouse', data.type || "a mouse response msg from server");
     });
-    // workerSocket.on('network', function(data) {
-    //     console.log('Client-network: ',data.type || data);
-    //     if(!!data.type && data.type==="network"){
-    //         workerSocket.emit('network', {id:data.reqId} || "a msg from server");
-    //     }else{
-    //         workerSocket.emit('network', data.type || "a msg from server");
-    //     }
-    // })
 }
 
 function fetchReseponse(reseponseObj,resData) {
