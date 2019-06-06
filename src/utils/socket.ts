@@ -1,8 +1,9 @@
 import io from 'socket.io-client'
 import {SERVER} from './constants'
 import {HttpFuncs, HttpReqMsgs,HTTPResponse,JSONPArguments} from '../interfaces/types'
-import httpPlayer from '../palyers/http'
-import jsonpPlayer from '../palyers/jsonp'
+import Player from '../palyers/index'
+import {DOMMutationTypes} from '../interfaces/types'
+
 
 let socket = io(SERVER.HttpHost,{transports:['polling','websocket']}); //'polling'
 let SocketID ="";
@@ -16,10 +17,10 @@ socket.on('id', function (msg) {
     socket.emit("id",{id:SocketID,name:"render"});
 });
 
-/** 执行http请求，将结果发回Server*/
+/** 执行http请求，将结果连带着reqID发回Server*/
 socket.on('fetch',function (reqMsg:HttpReqMsgs) {
     if(reqMsg.requestFunc!=HttpFuncs.fetch){ return;}
-    httpPlayer.fetch(reqMsg).then(data=>{
+    Player.events.http.fetch(reqMsg).then(data=>{
         let ResMsg:HTTPResponse= {
             reqId:reqMsg.reqId,
             data:data
@@ -30,7 +31,7 @@ socket.on('fetch',function (reqMsg:HttpReqMsgs) {
 });
 socket.on('xhr',function (reqMsg:HttpReqMsgs) {
     if(reqMsg.requestFunc!=HttpFuncs.xhr){ return;}
-    httpPlayer.xhr(reqMsg).then(data=>{
+    Player.events.http.xhr(reqMsg).then(data=>{
         let ResMsg:HTTPResponse= {
             reqId:reqMsg.reqId,
             data:data
@@ -42,7 +43,7 @@ socket.on('xhr',function (reqMsg:HttpReqMsgs) {
 socket.on('beacon',function (reqMsg:HttpReqMsgs) {
     if(reqMsg.requestFunc!=HttpFuncs.beacon){ return;}
     console.log(reqMsg)
-    httpPlayer.sendbeacon(reqMsg).then(data=>{
+    Player.events.http.sendbeacon(reqMsg).then(data=>{
         let ResMsg:HTTPResponse= {
             reqId:reqMsg.reqId,
             data:data
@@ -54,18 +55,35 @@ socket.on('beacon',function (reqMsg:HttpReqMsgs) {
 
 /** 发送jsonp请求，将结果发回Server*/
 socket.on("jsonp",function (jsonpMsg:JSONPArguments) {
-    jsonpPlayer.jsonp(jsonpMsg);
+    Player.events.jsonp.jsonp(jsonpMsg);
 });
-socket.on("snapshot",function () {
-
+socket.on("snapshot",function (data) {
+    Player.events.dom.renderSnapshot(data);
 });
-socket.on("mutation",function () {
-
+socket.on("mutation",function (data) {
+    switch (data.type) {
+        case DOMMutationTypes.node:
+            Player.events.dom.paintNodeAddorRemove(data);
+            break;
+        case DOMMutationTypes.attr:
+            break;
+        case DOMMutationTypes.text:
+            break;
+        default:
+            break;
+    }
 });
 socket.on("history",function () {
 
 });
-socket.on("event",function () {
+socket.on("event",function (data) {
+    if(data.type==="scroll"){
+        const {x,y,target}=data;
+        Player.events.dom.paintScroll({x,y,target});
+    }else{
+        const { w, h } =data;
+        Player.events.dom.paintResize({w,h});
+    }
 
 });
 

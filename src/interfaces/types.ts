@@ -1,3 +1,59 @@
+// export enum Events {
+//     move= 'move',
+//     click= 'click',
+//     attr="attr",
+//     node= "node",
+//     text= "text",
+//     form= "form",
+//     resize= "resize",
+//     scroll="scroll",
+//     snapshot="snapshot",
+//     jsonp="jsonp",
+//     http="http"
+// }
+export enum DOMMutationTypes {
+    attr = 'attr', // attribute mutate
+    node = 'node', // node add or remove
+    text = 'text' // text change
+}
+export interface NodeMutationData {
+    index?: number;
+    type: 'text' | 'ele';
+    target?: number;
+    textContent?: string;
+    html?: string;
+}
+export declare type DOMMutationRecord = {
+    type: DOMMutationTypes;
+    target: number;
+    attr?: {
+        k: string;
+        v: string;
+    };
+    prev?: number;
+    next?: number;
+    add?: NodeMutationData[];
+    remove?: NodeMutationData[];
+    text?: string;
+    html?: string;
+};
+
+
+export type EVENTS = {
+    move: any,
+    click: any,
+    attr: any,
+    node: any,
+    text: any,
+    form: any,
+    resize: any,
+    scroll: any,
+    dom:any,
+    jsonp:any,
+    http:any,
+    default?:any
+}
+
 export enum HttpFuncs {
     beacon = 'beacon',
     fetch = 'fetch',

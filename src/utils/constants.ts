@@ -1,4 +1,4 @@
-
+export const RECORDER_ID="recorder-id";
 export const SERVER = {
     HttpHost: "http://localhost:3000",
     SocketHost:'ws://localhost:3000',
