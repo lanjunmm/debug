@@ -7,7 +7,7 @@ export type Observer = {
 }
 
 export type SOCKET = {
-    socket?: any
+    connect?: any
 }
 
 export enum HistoryTypes {

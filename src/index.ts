@@ -51,21 +51,22 @@ export default class Worker implements WORKER{
         }
     }
     public connect(){
-        if(socket){
-            socket.emit('message', '测试Emit');
+        if(socket.connect!=null){
+            socket.connect.emit('message', '测试Emit');
         }
     }
     private getSnapshot(){
         const { clientWidth: w, clientHeight: h } = document.documentElement
         const { x, y } = (this.observers.event as any).getScrollPosition()
-        const host = location.host;
+        const host = location.protocol+"//"+location.host;
         let firtstSnapShot =  {
             type: 'snapshot',
             scroll: { x, y },
             resize: { w, h},
             referer:host,
             snapshot: snapShot.takeSnapshotForPage() // 第一次调用返回值是<head>部分outerHtml
-        }
+        };
+        // console.log(firtstSnapShot);
         sendToServer('snapshot',firtstSnapShot).then(resData=>{
             console.log("snapShot: ",resData);
         })
@@ -78,16 +79,19 @@ export default class Worker implements WORKER{
             _warn('worker already started')
             return
         }
-
         this.debuging = true
-        this.connect();
-        this.getSnapshot();
 
-        Object.keys(this.observers).forEach((observerName:ObserverName) => {
-            if (this.observers[observerName]!=null) {
-                (this.observers[observerName] as Observer).install();
+        socket.install().then(ans=>{
+            if(ans==="success"){
+                this.getSnapshot();
+                this.connect();
+                Object.keys(this.observers).forEach((observerName:ObserverName) => {
+                    if (this.observers[observerName]!=null) {
+                        (this.observers[observerName] as Observer).install();
+                    }
+                });
             }
-        })
+        });
     }
     public stop = (): void => {
         if (!this.debuging) {

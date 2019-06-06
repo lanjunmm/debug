@@ -4,8 +4,9 @@ import socket from '../utils/socket'
 
 export function sendToServer(eventName:EventName,data) {
     return new Promise((res)=>{
-        socket.emit(eventName,data);
-        socket.on(eventName, function (resData) {
+        console.log(eventName)
+        socket.connect.emit(eventName,data);
+        socket.connect.on(eventName, function (resData) {
             res(resData);
         });
     })

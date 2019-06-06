@@ -92,6 +92,7 @@ function start(){
     document.getElementById("fetch").addEventListener('click',()=>{
         let url = 'http://www.mocky.io/v2/5ce3e1d231000062387429e5';
         fetch(url).then(data=>{
+            console.log("fetch Response:",data);
             data.text().then(dataJson=>{
                 console.log("Fetch收到Server：",dataJson)
             })
@@ -106,7 +107,7 @@ function start(){
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange=function() {
             if (xhr.readyState===4 && xhr.status===200) {
-                console.log("xhr收到Server：",xhr.responseText);
+                console.log("xhr收到Server：",xhr.response);
             }
         }
         xhr.open("GET", url);//"http://localhost:3000/trans"
