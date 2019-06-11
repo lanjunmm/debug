@@ -9,6 +9,8 @@ let workerSocket=null;
 let renderSocket=null;
 let ClientMap = new Map();
 let ReqMap = new Map();
+let firtstSnapshot = null;
+const WorkerEvents = require('./events');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("*", function (req, res, next) {
@@ -76,42 +78,74 @@ const io = require('socket.io')(http,{transports:['polling','websocket']});//'po
 
 io.on('connection', function(socket) {
     console.log('a user connected');
+    //交换id和身份信息
     ClientMap.set(socket.id,socket);
     socket.emit("id",socket.id);
 
+    // worker和render没有重复的监听事件，故可以监听每个事件，若等到id交换完毕则会错过某些事件
+    workerMsg(socket);
+    renderMsg(socket);
+
     socket.on("id",function (data) {
         if(data.name==="worker"){
-            workerMsg(ClientMap.get(data.id));
+            workerSocket=socket;
+            // workerMsg(ClientMap.get(data.id));
         }else if(data.name==="render"){
-            renderMsg(ClientMap.get(data.id));
+            renderSocket = socket;
+            if(firtstSnapshot!=null){
+                renderSocket.emit('snapshot',firtstSnapshot);
+                firtstSnapshot=null;
+            }
+            // renderMsg(ClientMap.get(data.id));
         }
     });
 });
 
+
 function workerMsg(socket) {
-    workerSocket=socket;
-    workerSocket.on('message', function(data) {
-        console.log('Client-message: ',data);
-    });
-    workerSocket.on('jsonp', function(data) {
+    // workerSocket=socket;
+
+   // let EventsName = Object.keys(Events);
+   // EventsName.forEach(name=>{
+   //     workerSocket.on(Events[name], function(data) {
+   //         console.log(name);
+   //         if(renderSocket!=null){
+   //             renderSocket.emit(Events[name],data);
+   //             if(Events[name]!=='jsonp'){
+   //                 workerSocket.emit(Events[name],name);
+   //             }
+   //         }else {
+   //             workerSocket.emit(Events[name],"render is not exist!");
+   //         }
+   //
+   //     });
+   // });
+
+    socket.on(WorkerEvents.jsonp, function(data) {
         renderSocket.emit('jsonp',data);
     });
-    workerSocket.on('event', function(data) {
+    socket.on(WorkerEvents.event, function(data) {
         renderSocket.emit('event', data);
         // workerSocket.emit('event', data.type || "a event response msg from server");
     });
-    workerSocket.on('mutation', function(data) {
-        console.log('mutation');
+    socket.on(WorkerEvents.mutation, function(data) {
+        // console.log('mutation');
         renderSocket.emit('mutation', data);
-        workerSocket.emit('mutation', data.type || "a mutation response msg from server");
+        // workerSocket.emit('mutation', data.type || "a mutation response msg from server");
     });
-    workerSocket.on('snapshot', function(data) {
-        renderSocket.emit('snapshot',data);
-        console.log('snapshot');
+    socket.on(WorkerEvents.snapshot, function(data) {
+        // renderSocket.emit('snapshot',data);
+        if(renderSocket!=null){
+            renderSocket.emit('snapshot',data);
+        }else {
+            firtstSnapshot = data;
+        }
+        // console.log('snapshot');
         // workerSocket.emit('snapshot', data.type || "a snapshot response msg from server");
     });
-    workerSocket.on('mouse', function(data) {
-        workerSocket.emit('mouse', data.type || "a mouse response msg from server");
+    socket.on(WorkerEvents.mouse, function(data) {
+        renderSocket.emit('mouse', data);
+        // workerSocket.emit('mouse', data.type || "a mouse response msg from server");
     });
 }
 
@@ -138,20 +172,20 @@ function beaconResponse(reseponseObj,resData) {
 }
 
 function renderMsg(socket) {
-    renderSocket = socket;
-    renderSocket.on("fetch",function (fetchRes) {
+    // renderSocket = socket;
+    socket.on("fetch",function (fetchRes) {
         let reseponseObj = ReqMap.get(fetchRes.reqId);
         fetchReseponse(reseponseObj,fetchRes);
     });
-    renderSocket.on("xhr",function (xhrRes) {
+    socket.on("xhr",function (xhrRes) {
         let reseponseObj = ReqMap.get(xhrRes.reqId);
         xhrReseponse(reseponseObj,xhrRes);
     });
-    renderSocket.on("beacon",function (beaconRes) {
+    socket.on("beacon",function (beaconRes) {
         let reseponseObj = ReqMap.get(beaconRes.reqId);
         beaconResponse(reseponseObj,beaconRes);
     });
-    renderSocket.on('jsonp',function (jsonpRes) {
-        workerSocket.emit('jsonp', jsonpRes);
+    socket.on('jsonp',function (jsonpRes) {
+        workerSocket.emit(WorkerEvents.jsonp, jsonpRes);
     });
 }
