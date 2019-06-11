@@ -1,6 +1,6 @@
 import DomTreeBufferer from './dom-bufferer';
-import {DOMMutationRecord} from '../interfaces/types';
-import { ElementX, } from '../schemas/override';
+import {DOMMutationRecord,MouseReocrd,EventRecord} from '../interfaces/types';
+import { ElementX } from '../schemas/override';
 import { RECORDER_ID } from '../utils/constants';
 
 let { getElementByRecordId, bufferNewElement } = DomTreeBufferer;
@@ -13,6 +13,7 @@ class DomClass {
     public canvasHeight: number;
     public domLayer: HTMLIFrameElement;
     public canvas: HTMLElement;
+    public mouse: HTMLElement;
 
     constructor() {
 
@@ -27,13 +28,31 @@ class DomClass {
         tbody: 'table'
     };
     private createDoc(){
+        let existCanvas = document.getElementsByTagName('section');
+        if(existCanvas){
+            let eles = Array.from(existCanvas);
+            eles.forEach(item=>{
+                document.body.removeChild(item);
+            })
+        }
+
+
         let canvas = document.createElement('section');
+        canvas.style.position = "relative";
+
+        let mouse = document.createElement('img');
+        mouse.src = require("../assets/mouse.svg");
+        mouse.style.position="absolute";
+
         let ifr = document.createElement('iframe');
         ifr.style.width="100%";
         ifr.style.height="100%";
+
+        canvas.appendChild(mouse);
         canvas.appendChild(ifr);
         document.body.appendChild(canvas);
 
+        this.mouse = mouse;
         this.canvas = canvas;
         this.domLayer = ifr;
         DomTreeBufferer.canvas = canvas;
@@ -84,6 +103,21 @@ class DomClass {
             // document.body.scrollLeft = x; //document
             // document.body.scrollTop = y;
         }
+    }
+
+    public paintMouseMove(record: MouseReocrd): void {
+        const { x, y } = record;
+
+        this.mouse.style.top=`${y}px`;
+        this.mouse.style.left=`${x}px`;
+        // const position = `translate(${x}px, ${y}px)`
+        // this.mouse.style.transform = position
+    }
+
+   public paintMouseClick(record: MouseReocrd): void {
+        console.log(record);
+        // const { x, y } = record
+
     }
 
     public html2ElementOrText(html:string):ElementX{
@@ -209,6 +243,40 @@ class DomClass {
                     }
                 });
             }
+        }
+    }
+
+    public  paintAttributeMutate(record: DOMMutationRecord): void {
+        const { attr, target } = record;
+        const targetEle = getElementByRecordId(target);
+
+        if (targetEle && attr) {
+            // DO NOT TOUCH RECORDER-ID！
+            if (attr.key === RECORDER_ID) {
+                return;
+            }
+            targetEle.setAttribute(attr.key, attr.value);
+        }
+    }
+    public  paintTextChange(record: DOMMutationRecord): void {
+        const { text, html, target } = record;
+        const targetEle = getElementByRecordId(target);
+
+        if (targetEle) {
+            if (html) {
+                targetEle.innerHTML = html;
+                return;
+            }
+
+            targetEle.textContent = text as string | null;
+        }
+    }
+   public paintFormChange(record: EventRecord): void {
+        const { k, v, target } = record;
+        const targetEle = target && getElementByRecordId(target);
+
+        if (targetEle) {
+            targetEle[k!] = v;
         }
     }
 }

@@ -5,14 +5,6 @@ import {EVENTS} from "../interfaces/types";
 
 class PlayerClass {
     public events:EVENTS={
-        move: null,
-        click: null,
-        attr: null,
-        node: Dom.paintNodeAddorRemove,
-        text: null,
-        form: null,
-        resize: Dom.paintResize,
-        scroll: Dom.paintScroll,
         dom:Dom,
         jsonp:jsonpPlayer,
         http:httpPlayer,

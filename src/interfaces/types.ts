@@ -1,16 +1,33 @@
-// export enum Events {
-//     move= 'move',
-//     click= 'click',
-//     attr="attr",
-//     node= "node",
-//     text= "text",
-//     form= "form",
-//     resize= "resize",
-//     scroll="scroll",
-//     snapshot="snapshot",
-//     jsonp="jsonp",
-//     http="http"
-// }
+export enum Events {
+    node= "node",
+    form= "form",
+    resize= "resize",
+    scroll="scroll",
+    snapshot="snapshot",
+    jsonp="jsonp",
+    fetch="fetch",
+    xhr="xhr",
+    beacon='beacon',
+    mutation="mutation",
+    history="history",
+    mouse="mouse",
+    event="event",
+}
+export enum EventTypes {
+    scroll = "scroll",
+    resize = "resize",
+    form = "form"
+}
+export declare type EventRecord = {
+    type: EventTypes;
+    x?: number;
+    y?: number;
+    w?: number;
+    h?: number;
+    target?: number;
+    k?: string;
+    v?: number | string;
+};
 export enum DOMMutationTypes {
     attr = 'attr', // attribute mutate
     node = 'node', // node add or remove
@@ -27,8 +44,8 @@ export declare type DOMMutationRecord = {
     type: DOMMutationTypes;
     target: number;
     attr?: {
-        k: string;
-        v: string;
+        key: string;
+        value: string;
     };
     prev?: number;
     next?: number;
@@ -37,17 +54,17 @@ export declare type DOMMutationRecord = {
     text?: string;
     html?: string;
 };
-
+export declare type MouseReocrd = {
+    type: MouseTypes;
+    x?: number;
+    y?: number;
+};
+export declare enum MouseTypes {
+    click = "click",
+    move = "move"
+}
 
 export type EVENTS = {
-    move: any,
-    click: any,
-    attr: any,
-    node: any,
-    text: any,
-    form: any,
-    resize: any,
-    scroll: any,
     dom:any,
     jsonp:any,
     http:any,
