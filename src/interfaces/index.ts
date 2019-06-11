@@ -16,7 +16,7 @@ export interface FormELement extends HTMLElement {
     checked?: boolean
 }
 export type ObserverName = 'mutation' | 'console' | 'event' | 'mouse' | 'error' | 'history' | 'http' | 'jsonp'| 'iframe'
-export type EventName = 'mutation' | 'console' | 'event' | 'mouse' | 'error' | 'history' | 'jsonp' | 'snapshot' | 'iframe'
+export type EventName = 'mutation' | 'console' | 'event' | 'mouse' | 'error' | 'history' | 'worker_jsonp' | 'snapshot' | 'iframe'
 export type Observers = { [key in ObserverName]: Observer }
 
 export interface SnapShoter {

@@ -58,8 +58,11 @@ export default class DOMMutationObserver implements Observer {
       if (!parentEle) {
         return
       }
-      record.target = parentEle
-      record.html = target.parentElement.innerHTML
+      record.target = parentEle;
+      record.html = target.parentElement.innerHTML;
+      if(record.html==document.body.innerHTML){
+        return null;
+      }
     } else {
       // use textContent instend of innerText(non-standard),
       // see also https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext

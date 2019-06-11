@@ -5,8 +5,8 @@ import {Observer } from './interfaces/observer'
 import {WORKER,ObserverName,Observers } from './interfaces'
 import socket from './utils/socket'
 import {_warn} from './utils/tools'
-import { sendToServer } from './utils/requestServer'
-import snapShot from './utils/SnapShot'
+// import { sendToServer } from './utils/requestServer'
+// import snapShot from './utils/SnapShot'
 import DOMMutationObserver from './observers/mutation'
 import MouseObserver from './observers/mouse'
 import HistoryObserver from './observers/history'
@@ -35,6 +35,7 @@ export default class Worker implements WORKER{
         if (options && typeof options === 'object') {
             this.options = { ...this.options, ...options }
         }
+        socket.$on('initMutation',this.initMutation.bind(this));
     }
     public initObservers(){
         const { mutation, history, http, event, error, console: consoleOptions, mouse,jsonp,iframe } = this.options
@@ -50,30 +51,27 @@ export default class Worker implements WORKER{
             iframe:new IframeObserver(iframe)
         }
     }
-    public connect(){
-        if(socket.connect!=null){
-            socket.connect.emit('message', '测试Emit');
-        }
-    }
-    private getSnapshot(){
-        const { clientWidth: w, clientHeight: h } = document.documentElement
-        const { x, y } = (this.observers.event as any).getScrollPosition()
-        const host = location.protocol+"//"+location.host;
-        let firtstSnapShot =  {
-            type: 'snapshot',
-            scroll: { x, y },
-            resize: { w, h},
-            referer:host,
-            snapshot: snapShot.takeSnapshotForPage() // 第一次调用返回值是<head>部分outerHtml
-        };
-        // console.log(firtstSnapShot);
-        sendToServer('snapshot',firtstSnapShot).then(resData=>{
-            console.log("snapShot: ",resData);
-        })
+    // private getSnapshot(){
+    //     const { clientWidth: w, clientHeight: h } = document.documentElement
+    //     const { x, y } = (this.observers.event as any).getScrollPosition()
+    //     const host = location.protocol+"//"+location.host;
+    //     let firtstSnapShot =  {
+    //         type: 'snapshot',
+    //         scroll: { x, y },
+    //         resize: { w, h},
+    //         referer:host,
+    //         snapshot: snapShot.takeSnapshotForPage() // 第一次调用返回值是<head>部分outerHtml
+    //     };
+    //     sendToServer('snapshot',firtstSnapShot).then(resData=>{
+    //         console.log("snapShot: ",resData);
+    //     });
+    // }
+    public initMutation(){
+        this.observers.mutation.install();
     }
     public start(){
         // hack
-        console.log("start")
+        console.log("start");
         this.initObservers();
         if (this.debuging) {
             _warn('worker already started')
@@ -81,17 +79,22 @@ export default class Worker implements WORKER{
         }
         this.debuging = true
 
-        socket.install().then(ans=>{
-            if(ans==="success"){
-                this.getSnapshot();
-                this.connect();
-                Object.keys(this.observers).forEach((observerName:ObserverName) => {
-                    if (this.observers[observerName]!=null) {
-                        (this.observers[observerName] as Observer).install();
-                    }
-                });
+        Object.keys(this.observers).forEach((observerName:ObserverName) => {
+            if (observerName!=="mutation"&&this.observers[observerName]!=null) {
+                (this.observers[observerName] as Observer).install();
             }
         });
+        // socket.install().then(ans=>{
+        //     console.log("ans",ans);
+        //     if(ans==="success"){
+        //         // this.getSnapshot();
+        //         Object.keys(this.observers).forEach((observerName:ObserverName) => {
+        //             if (this.observers[observerName]!=null) {
+        //                 (this.observers[observerName] as Observer).install();
+        //             }
+        //         });
+        //     }
+        // });
     }
     public stop = (): void => {
         if (!this.debuging) {

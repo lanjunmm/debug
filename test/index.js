@@ -1,6 +1,6 @@
 /** npm run dev 使用法*/
 import Worker from '../src/index'
-let worker = new Worker({mouse:{mousemove:false},iframe:false});
+let worker = new Worker({mouse:{mousemove:true},iframe:false});
 worker.start();
 
 import {_replace} from "../src/utils/tools";
@@ -47,6 +47,11 @@ function testNetwork(){
 
 }
 function start(){
+    console.log("aaaaaaaaaaaa")
+    let  p=document.createElement('p');
+    p.innerHTML="好菜呜呜呜";
+    document.body.appendChild(p);
+
     document.getElementById('addEle').addEventListener('click', () => {
         let p = document.createElement('p')
         p.appendChild(document.createTextNode('加我一个！'))
@@ -113,6 +118,10 @@ function start(){
         xhr.open("GET", url);//"http://localhost:3000/trans"
         xhr.setRequestHeader("Content-Type","text/html")
         xhr.send("wwww");
+    });
+    document.getElementById("addclass").addEventListener('click',()=>{
+        let addClass = document.getElementById("addclass");
+        addClass.setAttribute('class',"red");
     });
 
     // testNetwork();

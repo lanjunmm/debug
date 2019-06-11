@@ -34,7 +34,7 @@ export type HttpOptions = {
 }
 export enum MessageTypes {
     network = 'network',
-    jsonp = 'jsonp',
+    jsonp = 'worker_jsonp',
     iframe = 'iframe',
     mutation = 'mutation',
     console='console' ,
