@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const http = require('http').Server(app);
-
+const WorkerEvents = require('./events');
 const port = 3000;
 
 let workerSocket=null;
@@ -10,7 +10,6 @@ let renderSocket=null;
 let ClientMap = new Map();
 let ReqMap = new Map();
 let firtstSnapshot = null;
-const WorkerEvents = require('./events');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("*", function (req, res, next) {
@@ -30,9 +29,6 @@ app.engine('html', require('ejs').renderFile);
 
 app.get('/testifr', function(req, res) {
     res.render('testIframe.html');
-});
-app.get('/testIfrReq', function(req, res) {
-    res.send("iframeRes");
 });
 app.get('/tranfer', function(req, res) {
     console.log('get:');
@@ -93,7 +89,7 @@ io.on('connection', function(socket) {
         }else if(data.name==="render"){
             renderSocket = socket;
             if(firtstSnapshot!=null){
-                renderSocket.emit('snapshot',firtstSnapshot);
+                sendToRender('snapshot',firtstSnapshot);
                 firtstSnapshot=null;
             }
             // renderMsg(ClientMap.get(data.id));
@@ -101,50 +97,35 @@ io.on('connection', function(socket) {
     });
 });
 
+function sendToRender(eventName,data) {
+    if(renderSocket!=null){
+        renderSocket.emit(eventName,data);
+    }
+}
 
 function workerMsg(socket) {
     // workerSocket=socket;
-
-   // let EventsName = Object.keys(Events);
-   // EventsName.forEach(name=>{
-   //     workerSocket.on(Events[name], function(data) {
-   //         console.log(name);
-   //         if(renderSocket!=null){
-   //             renderSocket.emit(Events[name],data);
-   //             if(Events[name]!=='jsonp'){
-   //                 workerSocket.emit(Events[name],name);
-   //             }
-   //         }else {
-   //             workerSocket.emit(Events[name],"render is not exist!");
-   //         }
-   //
-   //     });
-   // });
-
     socket.on(WorkerEvents.jsonp, function(data) {
-        renderSocket.emit('jsonp',data);
+        sendToRender('jsonp',data);
     });
     socket.on(WorkerEvents.event, function(data) {
-        renderSocket.emit('event', data);
+        sendToRender('event', data);
         // workerSocket.emit('event', data.type || "a event response msg from server");
     });
     socket.on(WorkerEvents.mutation, function(data) {
-        // console.log('mutation');
-        renderSocket.emit('mutation', data);
+        sendToRender('mutation', data);
         // workerSocket.emit('mutation', data.type || "a mutation response msg from server");
     });
     socket.on(WorkerEvents.snapshot, function(data) {
-        // renderSocket.emit('snapshot',data);
         if(renderSocket!=null){
-            renderSocket.emit('snapshot',data);
+            sendToRender('snapshot',data);
         }else {
             firtstSnapshot = data;
         }
-        // console.log('snapshot');
         // workerSocket.emit('snapshot', data.type || "a snapshot response msg from server");
     });
     socket.on(WorkerEvents.mouse, function(data) {
-        renderSocket.emit('mouse', data);
+        sendToRender('mouse', data);
         // workerSocket.emit('mouse', data.type || "a mouse response msg from server");
     });
 }
