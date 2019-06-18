@@ -110,8 +110,6 @@ class DomClass {
 
         this.mouse.style.top=`${y}px`;
         this.mouse.style.left=`${x}px`;
-        // const position = `translate(${x}px, ${y}px)`
-        // this.mouse.style.transform = position
     }
 
    public paintMouseClick(record: MouseReocrd): void {
@@ -137,7 +135,7 @@ class DomClass {
     }
 
     public  paintNodeAddorRemove(record: DOMMutationRecord): void {
-        console.log(record);
+        // console.log(record);
         const { add, remove, target, prev, next } = record;
         const parentEle = DomTreeBufferer.getElementByRecordId(target);
 

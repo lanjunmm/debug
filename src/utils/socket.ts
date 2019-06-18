@@ -12,7 +12,6 @@ socket.on('connect', function () {
     console.log("socket 连接成功");
 });
 socket.on('id', function (msg) {
-    console.log("id：",msg);
     SocketID = msg;
     socket.emit("id",{id:SocketID,name:"render"});
 });
@@ -30,7 +29,6 @@ socket.on(Events.fetch,function (reqMsg:HttpReqMsgs) {
         console.log("fetch Data:",ResMsg);
     });
 });
-
 socket.on(Events.xhr, function (reqMsg:HttpReqMsgs) {
     if(reqMsg.requestFunc!=HttpFuncs.xhr){ return;}
     Player.events.http.xhr(reqMsg).then(data=>{
@@ -42,10 +40,8 @@ socket.on(Events.xhr, function (reqMsg:HttpReqMsgs) {
         console.log("xhr Data:",ResMsg);
     });
 });
-
 socket.on(Events.beacon,function (reqMsg:HttpReqMsgs) {
     if(reqMsg.requestFunc!=HttpFuncs.beacon){ return;}
-    console.log(reqMsg)
     Player.events.http.sendbeacon(reqMsg).then(data=>{
         let ResMsg:HTTPResponse= {
             reqId:reqMsg.reqId,
@@ -85,6 +81,7 @@ socket.on(Events.history,function () {
 
 });
 
+/**  鼠标移动，scroll，resize事件 */
 socket.on(Events.mouse,function (data) {
     Player.events.dom.paintMouseMove(data);
 });
