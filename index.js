@@ -102,6 +102,11 @@ function sendToRender(eventName,data) {
         renderSocket.emit(eventName,data);
     }
 }
+function sendToWorker(eventName,data) {
+    if(workerSocket!=null){
+        workerSocket.emit(eventName,data);
+    }
+}
 
 function workerMsg(socket) {
     // workerSocket=socket;
@@ -167,6 +172,9 @@ function renderMsg(socket) {
         beaconResponse(reseponseObj,beaconRes);
     });
     socket.on('jsonp',function (jsonpRes) {
-        workerSocket.emit(WorkerEvents.jsonp, jsonpRes);
+        sendToWorker(WorkerEvents.jsonp, jsonpRes);
+    });
+    socket.on('renderEvent',function (jsonpRes) {
+        sendToWorker('renderEvent', jsonpRes);
     });
 }
