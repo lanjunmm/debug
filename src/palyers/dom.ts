@@ -2,6 +2,7 @@ import DomTreeBufferer from './dom-bufferer';
 import {DOMMutationRecord,MouseReocrd,EventRecord} from '../interfaces/types';
 import { ElementX } from '../schemas/override';
 import { RECORDER_ID } from '../utils/constants';
+import initObserver from "../observer/index";
 
 let { getElementByRecordId, bufferNewElement } = DomTreeBufferer;
 getElementByRecordId = getElementByRecordId.bind(DomTreeBufferer);
@@ -60,6 +61,7 @@ class DomClass {
         return {canvas,ifr};
     }
 
+
     public renderSnapshot(data){
         let {ifr:domlayer} = this.createDoc(); //document
         DomTreeBufferer.fillTheDomLayerBySnapshot(
@@ -71,6 +73,8 @@ class DomClass {
         });
         this.paintResize(data.resize);
         this.paintScroll(data.scroll);
+        /** 快照加载完成后，初始化观察对象*/
+        initObserver.init();
     }
     public  paintResize(record): void {
         const { w, h } = record;
@@ -115,7 +119,6 @@ class DomClass {
    public paintMouseClick(record: MouseReocrd): void {
         console.log(record);
         // const { x, y } = record
-
     }
 
     public html2ElementOrText(html:string):ElementX{
