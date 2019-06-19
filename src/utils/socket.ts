@@ -2,8 +2,9 @@ import io from 'socket.io-client'
 import {SERVER} from '../observers/constants'
 import {SOCKET} from '../interfaces/observer'
 import snapShot from "./SnapShot";
-import {EventName} from "../interfaces";
 import EventHub from "../utils/eventHub";
+import mousePlayer from "../players/mouse";
+import eventsPlayer from "../players/events";
 
 class Socket extends EventHub implements SOCKET{
     public connect=null;
@@ -14,31 +15,19 @@ class Socket extends EventHub implements SOCKET{
     }
 
     public install(){
-       // return new Promise((res)=>{
             this.connect= io(SERVER.HttpHost,{transports:['polling','websocket']});
             this.connect.on('connect',  ()=> {
                 console.log("socket 连接成功");
                 this.getSnapshot();
                 this.$emit('initMutation');
+                this.listeners();
             });
            this.connect.on('id',  (msg)=> {
                console.log('id: ',msg);
                this.SocketID = msg;
                this.connect.emit("id", {id: this.SocketID, name: "worker"});
-               // res('success');
            });
            console.log("socket");
-        // })
-    }
-
-    public sendToServer(eventName:EventName,data) {
-        return new Promise((res)=>{
-            console.log(eventName);
-            this.connect.emit(eventName,data);
-            this.connect.on(eventName, function (resData) {
-                res(resData);
-            });
-        })
     }
 
     private getSnapshot(){
@@ -56,9 +45,27 @@ class Socket extends EventHub implements SOCKET{
         };
         console.log("发出快照");
         this.connect.emit('snapshot',firtstSnapShot);
-        // this.sendToServer('snapshot',firtstSnapShot).then(resData=>{
-        //     console.log("snapShot: ",resData);
-        // });
+    }
+    private listeners(){
+        this.connect.on('renderEvent',function (data) {
+            switch (data.type) {
+                case "click":
+                    mousePlayer.replayClick(parseInt(data.target));
+                    break;
+                case "scroll":
+                    eventsPlayer.paintScroll(data);
+                    break;
+                case "resize":
+                    eventsPlayer.paintResize(data);
+                    break;
+                case "form":
+                    eventsPlayer.paintFormChange(data);
+                    break;
+                default:
+                    break;
+            }
+
+        });
     }
 }
 

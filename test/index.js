@@ -3,8 +3,6 @@ import Worker from '../src/index'
 let worker = new Worker({mouse:{mousemove:true},iframe:false});
 worker.start();
 
-import {_replace} from "../src/utils/tools";
-
 /** 打包后调用法：*/
 // let worker = new window.worker();
 // worker.start();
@@ -88,12 +86,12 @@ function start(){
     document.getElementById("stop").addEventListener('click',()=>{
         worker.stop();
     });
-    document.getElementById("iframe").addEventListener('click',()=>{
-        let url="http://localhost:3000/testifr";
-        let ele = document.createElement("iframe");
-        ele.src = url;
-        document.getElementsByTagName('body')[0].appendChild(ele);
-    });
+    // document.getElementById("iframe").addEventListener('click',()=>{
+    //     let url="http://localhost:3000/testifr";
+    //     let ele = document.createElement("iframe");
+    //     ele.src = url;
+    //     document.getElementsByTagName('body')[0].appendChild(ele);
+    // });
     document.getElementById("fetch").addEventListener('click',()=>{
         let url = 'http://www.mocky.io/v2/5ce3e1d231000062387429e5';
         fetch(url).then(data=>{
@@ -123,9 +121,13 @@ function start(){
         let addClass = document.getElementById("addclass");
         addClass.setAttribute('class',"red");
     });
-
+    document.getElementById("changeStyle").addEventListener('click',()=>{
+        let changeDiv = document.getElementById("change");
+        changeDiv.style.backgroundImage="linear-gradient(#FC354C,#0ABFBC)";
+    });
     // testNetwork();
 }
+
 
 
 document.addEventListener('DOMContentLoaded', start);

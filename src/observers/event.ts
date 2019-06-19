@@ -72,8 +72,8 @@ export default class EventObserver implements Observer {
     }
 
     public getResize = (): void => {
-        const {clientWidth: w, clientHeight: h} = document.documentElement
-        const record: EventReocrd = {type: EventTypes.resize, w, h}
+        const {clientWidth: w, clientHeight: h} = document.documentElement;
+        const record: EventReocrd = {type: EventTypes.resize, w, h};
         this.sendRecord(record);
     }
 
@@ -117,7 +117,7 @@ export default class EventObserver implements Observer {
             addListener({
                 target: document,
                 event: 'scroll',
-                callback: this.getScroll,
+                callback: _throttle(this.getScroll),
                 options: true
             });
         }

@@ -16,8 +16,14 @@
         .red{
             background-color: red;
         }
+        button{
+            background-color: #7aecc6;
+            height: 30px;
+            border: none;
+            box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
+        }
     </style>
-    <!--<script type=text/javascript src='../www/static/js/app.94c611d7dcf9df80a9a6.js'></script>-->
+    <!--<script type=text/javascript src='../www/static/js/app.cf91000b55ca14aa5e44.js'></script>-->
     <!--<script type=text/javascript src='./index.js'></script>-->
 </head>
 
@@ -46,20 +52,28 @@
     <li>content 6</li>
     <li id="complete">complete</li>
 </ul>
-<iframe id="ifr" src="http://localhost:3000/testifr"></iframe>
+<!--<iframe id="ifr" src="http://localhost:3000/testifr"></iframe>-->
 
+<div id="change">
+    <p>是否调试</p>
+    <button id="start">start</button>
+    <button id="stop">stop</button>
 
-<button id="start">start</button>
-<button id="stop">stop</button>
-<button id="addEle">add</button>
-<div id="addedElements" style="background-color: red"></div>
-<button id="reqJson">请求数据</button>
-<button id="reqJson2">请求数据2</button>
-<button id="fetch">fetch</button>
-<button id="xhr">xhr</button>
-<button id="beacon">beacon</button>
-<button id="addclass">addclass</button>
-<button id="iframe">iframe</button>
+    <p>改变DOM</p>
+    <button id="changeStyle">changeStyle</button>
+    <button id="addclass">addclass</button>
+    <button id="addEle">add</button>
+    <div id="addedElements" style="background-color: red"></div>
+
+    <p>网络请求</p>
+    <button id="reqJson">请求数据</button>
+    <button id="reqJson2">请求数据2</button>
+    <button id="fetch">fetch</button>
+    <button id="xhr">xhr</button>
+    <button id="beacon">beacon</button>
+
+    <!--<button id="iframe">iframe</button>-->
+</div>
 
 <div contenteditable>venom a <a href="://baidu.com">baidu</a></div>
 

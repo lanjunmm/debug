@@ -4,6 +4,7 @@ import {SnapShoter,ElementX} from '../interfaces'
 
 class SnapShot  implements SnapShoter{
     public map: Map<HTMLElement | Element | Node | EventTarget, number> = new Map();
+    private RecorderId2Element: Map<number, ElementX> = new Map();
     public latestSnapshot: string
     public inited: boolean = false
     private id: number = 0 // self-increase id
@@ -48,7 +49,8 @@ class SnapShot  implements SnapShoter{
 
     private buffer = (ele: ElementX): number => {
         let recorderId = this.map.get(ele) || this.newId()
-        this.map.set(ele, recorderId)
+        this.map.set(ele, recorderId);
+        this.RecorderId2Element.set(recorderId, ele);
 
         this.mark(ele, recorderId)
         return recorderId
@@ -67,6 +69,10 @@ class SnapShot  implements SnapShoter{
     // get recorderId from map by element
     public getRecordIdByElement = (ele: ElementX | EventTarget): number | undefined => {
         return this.map.get(ele)
+    }
+    public getElementByRecordId(id: number): ElementX | undefined {
+        let ele = this.RecorderId2Element.get(id);
+        return ele;
     }
 }
 
