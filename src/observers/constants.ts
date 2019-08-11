@@ -13,7 +13,7 @@ export const REQUESTINIT = {
         signal:  null,
         window: null
     };
-
+// const HOST = "http://localhost:3000";
 export const SERVER = {
     HttpHost: "http://localhost:3000",
     SocketHost:'ws://localhost:3000',

@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ui-recoder</title>
     <style>
-        body {
-            height: 2000px;
+        body{
+            margin: 0;
+        }
+        #main {
+            height: 1500px;
         }
         ul {
             height: 200px;
@@ -22,17 +25,33 @@
             border: none;
             box-shadow: 0 1px 6px 0 rgba(32,33,36,0.28);
         }
+        header{
+            height: 50px;
+            background-color: darkcyan;
+            color: white;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .funcs{
+            background-color: #D6EAF8;
+        }
+        #change{
+            background-color: #ECF0F1;
+        }
     </style>
-    <!--<script type=text/javascript src='../www/static/js/app.cf91000b55ca14aa5e44.js'></script>-->
-    <!--<script type=text/javascript src='./index.js'></script>-->
+    <script type=text/javascript src='../www/static/js/app.c30ebe29ae2bdefcc1df.js'></script>
+    <script type=text/javascript src='./index.js'></script>
 </head>
 
 <body>
+<div id="main">
+    <header>FUNCTIONS</header>
 <ul>
-    <li onclick="console.log(widn.xxx.xxxx)">simple error</li>
-    <li onclick="window.unhandleReject()">simple rejection</li>
-    <li id="errClick">error in other file</li>
-    <li id="rejectClick">rejection in other file</li>
+    <li>content 5</li>
+    <li>content 5</li>
+    <li>content 5</li>
     <li>content 5</li>
     <li>content 6</li>
     <li>content 6</li>
@@ -55,22 +74,25 @@
 <!--<iframe id="ifr" src="http://localhost:3000/testifr"></iframe>-->
 
 <div id="change">
-    <p>是否调试</p>
+    <p class="funcs">是否调试</p>
     <button id="start">start</button>
     <button id="stop">stop</button>
 
-    <p>改变DOM</p>
+    <p class="funcs">改变DOM</p>
     <button id="changeStyle">changeStyle</button>
     <button id="addclass">addclass</button>
     <button id="addEle">add</button>
     <div id="addedElements" style="background-color: red"></div>
 
-    <p>网络请求</p>
+    <p class="funcs">网络请求</p>
     <button id="reqJson">请求数据</button>
     <button id="reqJson2">请求数据2</button>
     <button id="fetch">fetch</button>
     <button id="xhr">xhr</button>
     <button id="beacon">beacon</button>
+
+    <p class="funcs">原生能力</p>
+    <button id="device">设备信息</button>
 
     <!--<button id="iframe">iframe</button>-->
 </div>
@@ -78,7 +100,7 @@
 <div contenteditable>venom a <a href="://baidu.com">baidu</a></div>
 
 <input type="text">
-
+</div>
 <script>
     function hello(obj) {
         console.log(obj);
