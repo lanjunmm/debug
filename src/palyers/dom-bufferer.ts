@@ -11,7 +11,7 @@ import { RECORDER_ID } from '../utils/constants';
 // TODO: merge into painter
 class DomTreeBuffererClass {
     public pageSnapshot: string;
-    public domLayer: HTMLIFrameElement;
+    public domLayer: Document;
     public canvas: HTMLElement;
     public referer: string;
 
@@ -69,7 +69,7 @@ class DomTreeBuffererClass {
     /** 将快照插入页面
      * */
     public fillTheDomLayerBySnapshot(
-        domLayer: HTMLIFrameElement,
+        domLayer: Document,
         pageSnapshot: string,
         referer: string
     ): Promise<boolean> {
@@ -82,7 +82,7 @@ class DomTreeBuffererClass {
 
         return new Promise((resolve, reject) => {
             // const layerDoc = domLayer;
-            const layerDoc = domLayer.contentDocument;
+            const layerDoc = domLayer;
 
             if (!layerDoc) {
                 reject(false);

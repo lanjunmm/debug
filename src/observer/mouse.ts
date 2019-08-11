@@ -36,7 +36,7 @@ export default class MouseObserver  implements Observer {
 
     private getMouseClickRecord = (evt: MouseEvent): void => {
         const {pageX: x, pageY: y} = evt;
-        let clickedEle = DomTreeBufferer.domLayer.contentDocument.elementFromPoint(x,y);
+        let clickedEle = DomTreeBufferer.domLayer.elementFromPoint(x,y);
         let eleId = clickedEle.getAttribute(RECORDER_ID);
         const record: MouseClickRecord = {type: MouseTypes.click, target:eleId}
         //
@@ -45,7 +45,7 @@ export default class MouseObserver  implements Observer {
 
     public install(): void {
         const {addListener} = this
-        const layerDoc = DomTreeBufferer.domLayer.contentDocument;
+        const layerDoc = DomTreeBufferer.domLayer;
 
             addListener({
                 target: layerDoc,

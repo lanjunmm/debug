@@ -12,7 +12,7 @@ class DomClass {
     public initialDomReady: boolean = false;
     public canvasWidth: number;
     public canvasHeight: number;
-    public domLayer: HTMLIFrameElement;
+    public domLayer: Document;
     public canvas: HTMLElement;
     public mouse: HTMLElement;
 
@@ -28,44 +28,11 @@ class DomClass {
         thead: 'table',
         tbody: 'table'
     };
-    private createDoc(){
-        let existCanvas = document.getElementsByTagName('section');
-        if(existCanvas){
-            let eles = Array.from(existCanvas);
-            eles.forEach(item=>{
-                document.body.removeChild(item);
-            })
-        }
-
-
-        let canvas = document.createElement('section');
-        canvas.style.position = "relative";
-
-        let mouse = document.createElement('img');
-        mouse.src = require("../assets/mouse.svg");
-        mouse.style.position="absolute";
-
-        let ifr = document.createElement('iframe');
-        ifr.style.width="100%";
-        ifr.style.height="100%";
-
-        canvas.appendChild(mouse);
-        canvas.appendChild(ifr);
-        document.body.appendChild(canvas);
-
-        this.mouse = mouse;
-        this.canvas = canvas;
-        this.domLayer = ifr;
-        DomTreeBufferer.canvas = canvas;
-        DomTreeBufferer.domLayer = ifr;
-        return {canvas,ifr};
-    }
-
 
     public renderSnapshot(data){
-        let {ifr:domlayer} = this.createDoc(); //document
+        this.domLayer = document;
         DomTreeBufferer.fillTheDomLayerBySnapshot(
-            domlayer,
+            this.domLayer,
             data.snapshot,
             data.referer
         ).then(_ => {
@@ -80,13 +47,13 @@ class DomClass {
         const { w, h } = record;
         this.canvasWidth = w;
         this.canvasHeight = h;
-
-        this.canvas.style.width = w + 'px';
-        this.canvas.style.height = h + 'px';
+        //
+        // this.canvas.style.width = w + 'px';
+        // this.canvas.style.height = h + 'px';
 
         // window.resizeTo(w, h); // 在chrome中window.resize只在window.open方法中打开的窗口起作用
-        // document.body.style.width = w + 'px';
-        // document.body.style.height = h + 'px';
+        document.body.style.width = w + 'px';
+        document.body.style.height = h + 'px';
     }
     public paintScroll(record): void {
         // console.log(record)
@@ -99,7 +66,7 @@ class DomClass {
                 targetEle.scrollLeft = x!;
             }
         } else {
-            const targetDocument = this.domLayer.contentDocument;
+            const targetDocument = document
             if (targetDocument) {
                 targetDocument.body.scrollLeft = x!;
                 targetDocument.body.scrollTop = y!;
@@ -110,10 +77,11 @@ class DomClass {
     }
 
     public paintMouseMove(record: MouseReocrd): void {
-        const { x, y } = record;
+        console.log("mouseMove",record);
+        // const { x, y } = record;
 
-        this.mouse.style.top=`${y}px`;
-        this.mouse.style.left=`${x}px`;
+        // this.mouse.style.top=`${y}px`;
+        // this.mouse.style.left=`${x}px`;
     }
 
    public paintMouseClick(record: MouseReocrd): void {

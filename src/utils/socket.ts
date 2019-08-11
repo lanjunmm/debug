@@ -62,7 +62,6 @@ socket.on(Events.snapshot,function (data) {
     Player.events.dom.renderSnapshot(data);
 });
 socket.on(Events.mutation,function (data) {
-    console.log("mutaition",data);
     switch (data.type) {
         case DOMMutationTypes.node:
             Player.events.dom.paintNodeAddorRemove(data);
