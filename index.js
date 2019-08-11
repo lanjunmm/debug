@@ -73,7 +73,7 @@ http.listen(port, function() {
 const io = require('socket.io')(http,{transports:['polling','websocket']});//'polling'
 
 io.on('connection', function(socket) {
-    console.log('a user connected');
+    console.log('a user connected',socket.id);
     //交换id和身份信息
     ClientMap.set(socket.id,socket);
     socket.emit("id",socket.id);
@@ -85,9 +85,11 @@ io.on('connection', function(socket) {
     socket.on("id",function (data) {
         if(data.name==="worker"){
             workerSocket=socket;
+            console.log('worker',socket.id);
             // workerMsg(ClientMap.get(data.id));
         }else if(data.name==="render"){
             renderSocket = socket;
+            console.log('render',socket.id);
             if(firtstSnapshot!=null){
                 sendToRender('snapshot',firtstSnapshot);
                 firtstSnapshot=null;
