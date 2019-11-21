@@ -35,7 +35,7 @@ export default class EventObserver implements Observer {
     // Provide that document's direction is `rtl`(default)
     public getScrollPosition = (): { x: number; y: number } => {
         // Quirks "BackCompat" mode on the contrary （false is standardMode "CSS1Compat"
-        const layerDoc = DomTreeBufferer.domLayer.contentDocument;
+        const layerDoc = DomTreeBufferer.domLayer;
         const isStandardsMode = layerDoc.compatMode === 'CSS1Compat'
         const x = isStandardsMode ? layerDoc.documentElement.scrollLeft : layerDoc.body.scrollLeft
         const y = isStandardsMode ? layerDoc.documentElement.scrollTop : layerDoc.body.scrollTop
@@ -43,7 +43,7 @@ export default class EventObserver implements Observer {
     }
 
     public getScroll = (evt?: Event): void => {
-        const layerDoc = DomTreeBufferer.domLayer.contentDocument;
+        const layerDoc = DomTreeBufferer.domLayer;
         const {target} = evt || {target: document}
         let record = {type: EventTypes.scroll} as EventReocrd
 
@@ -51,7 +51,8 @@ export default class EventObserver implements Observer {
         // 2. No event invoking
         if (target === layerDoc || !target) {
             let {x, y} = this.getScrollPosition()
-            record = {...record, x, y};
+            record['x']=x;
+            record['y']=y;
             //TODO: 节流
             this.sendRecord(record);
             return
@@ -60,7 +61,9 @@ export default class EventObserver implements Observer {
         let targetX = target as ElementX;
         const {scrollLeft: x, scrollTop: y} = targetX;
         const recorderId = DomTreeBufferer.getRecordIdByElement(targetX)
-        record = {...record, x, y, target: recorderId}
+        record['x']=x;
+        record['y']=y;
+        record['target']=recorderId;
         this.sendRecord(record);
     }
 
@@ -104,7 +107,7 @@ export default class EventObserver implements Observer {
 
     public install(): void {
         const {addListener} = this;
-        const layerDoc = DomTreeBufferer.domLayer.contentDocument;
+        const layerDoc = DomTreeBufferer.domLayer;
 
             addListener({
                 target: layerDoc,

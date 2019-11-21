@@ -10,10 +10,13 @@ export default class Render {
             socket.emit("jsonp",msg);
         };
 
-        const playerDefaultStyle = document.createElement('style');
-        playerDefaultStyle.setAttribute('type', 'text/css');
-        playerDefaultStyle.innerHTML = `body{background: #000;}`;
-        document.head!.insertBefore(playerDefaultStyle, document.head!.firstChild!);
+        // document.addEventListener('DOMContentLoaded', ()=>{
+            let blanket = `<html lang="en"><head><meta charset="UTF-8"><title>Ready</title></head></html>`;
+            document.documentElement.innerHTML = blanket;
+            document.write(blanket);
+            document.body = document.createElement('body');
+            document.body.innerText="READY";
+        // });
     }
 }
 /** 打包留出全局接口：*/
